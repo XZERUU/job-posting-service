@@ -6,9 +6,28 @@ use Illuminate\Database\Eloquent\Model;
 
 class Application extends Model
 {
-    protected $fillable = ['user_id', 'job_id', 'status'];
+    // Define the table if it's not the plural of the model name
+    // protected $table = 'applications';
 
-    public function job() {
-        return $this->belongsTo(Job::class);
+    // Mass-assignable attributes
+    protected $fillable = [
+        'user_id',
+        'job_id',
+        'cover_letter',
+        'status',
+    ];
+
+    // If you use timestamps (created_at, updated_at), keep this as true
+    public $timestamps = true;
+
+    // Relationships
+    public function job()
+    {
+        return $this->belongsTo(JobPost::class, 'job_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

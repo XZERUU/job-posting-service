@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Register your custom middleware alias here
         $middleware->alias([
             'employer' => \App\Http\Middleware\EnsureUserIsEmployer::class,
+            'admin' => \App\Http\Middleware\CheckAdmin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
