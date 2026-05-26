@@ -11,10 +11,21 @@ class SeekerProfile extends Model
         'user_id',
         'phone',
         'headline',
+        'location',
+        'about',
+        'skills',
+        'education',
+        'experiences',
         'resume_path',
         'linkedin_url',
         'portfolio_url',
         'github_url',
+    ];
+
+    protected $casts = [
+        'skills' => 'array',
+        'education' => 'array',
+        'experiences' => 'array',
     ];
 
     public function user(): BelongsTo

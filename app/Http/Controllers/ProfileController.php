@@ -16,14 +16,23 @@ class ProfileController extends Controller
     public function show(): View
     {
         $user = Auth::user();
-        $profile = $user->seekerProfile ?? (object)[]; 
+        $profile = $user->seekerProfile ?? (object)[];
+        $applications = $user->applications()
+            ->with('jobPost.employer')
+            ->latest()
+            ->get();
 
         return view('seeker-profile', [
             'user' => $user,
             'profile' => $profile,
-            'recentApplications' => [], 
+            'recentApplications' => $applications->take(5),
             'recommendedJobs' => [],
-            'stats' => ['applied' => 0, 'under_review' => 0, 'saved' => 0]
+            'stats' => [
+                'applied' => $applications->count(),
+                'under_review' => $applications->where('status', 'pending')->count(),
+                'approved' => $applications->where('status', 'approved')->count(),
+                'profile_views' => 0,
+            ],
         ]);
     }
 
@@ -62,6 +71,17 @@ class ProfileController extends Controller
         $validated = $request->validate([
             'phone' => 'nullable|string|max:20',
             'headline' => 'nullable|string|max:255',
+            'location' => 'nullable|string|max:255',
+            'about' => 'nullable|string|max:1000',
+            'skills' => 'nullable|string|max:1000',
+            'education_degree' => 'nullable|string|max:255',
+            'education_school' => 'nullable|string|max:255',
+            'education_year_from' => 'nullable|string|max:20',
+            'education_year_to' => 'nullable|string|max:20',
+            'experience_position' => 'nullable|string|max:255',
+            'experience_company' => 'nullable|string|max:255',
+            'experience_year_from' => 'nullable|string|max:20',
+            'experience_year_to' => 'nullable|string|max:20',
             'resume' => 'nullable|file|mimes:pdf|max:2048',
         ]);
 
@@ -71,6 +91,21 @@ class ProfileController extends Controller
 
         $profile->phone = $validated['phone'] ?? null;
         $profile->headline = $validated['headline'] ?? null;
+        $profile->location = $validated['location'] ?? null;
+        $profile->about = $validated['about'] ?? null;
+        $profile->skills = $this->parseCommaList($validated['skills'] ?? null);
+        $profile->education = $this->profileListEntry($validated, 'education', [
+            'degree',
+            'school',
+            'year_from',
+            'year_to',
+        ]);
+        $profile->experiences = $this->profileListEntry($validated, 'experience', [
+            'position',
+            'company',
+            'year_from',
+            'year_to',
+        ]);
 
         if ($request->hasFile('resume')) {
             if ($profile->resume_path) {
@@ -83,6 +118,33 @@ class ProfileController extends Controller
         $profile->save();
 
         return back()->with('status', 'profile-updated');
+    }
+
+    private function parseCommaList(?string $value): array
+    {
+        if (! $value) {
+            return [];
+        }
+
+        return collect(explode(',', $value))
+            ->map(fn (string $item) => trim($item))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    private function profileListEntry(array $validated, string $prefix, array $fields): array
+    {
+        $entry = [];
+
+        foreach ($fields as $field) {
+            $entry[$field] = $validated["{$prefix}_{$field}"] ?? null;
+        }
+
+        $hasValue = collect($entry)->filter(fn ($value) => filled($value))->isNotEmpty();
+
+        return $hasValue ? [$entry] : [];
     }
 
     public function updateLinks(Request $request): RedirectResponse
