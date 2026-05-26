@@ -17,22 +17,22 @@ class DatabaseSeeder extends Seeder
     {
         // Create test seeker user
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Job Seeker Demo',
+            'email' => 'seeker@test.com',
             'role' => 'seeker',
         ]);
 
         // Create admin user
         User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
+            'name' => 'Admin Demo',
+            'email' => 'admin@test.com',
             'role' => 'admin',
         ]);
 
         // Create employer user
         User::factory()->create([
-            'name' => 'Employer User',
-            'email' => 'employer@example.com',
+            'name' => 'Employer Demo',
+            'email' => 'employer@test.com',
             'role' => 'employer',
         ]);
     }

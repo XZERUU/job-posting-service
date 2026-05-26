@@ -32,7 +32,7 @@
                         @forelse($applications as $application)
                         <tr class="border-t border-gray-200 hover:bg-gray-50">
                             <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $application->user->name ?? 'N/A' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-600">{{ $application->jobPost->title ?? 'N/A' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">{{ $application->jobPost->job_title ?? 'N/A' }}</td>
                             <td class="px-6 py-4 text-sm">
                                 <span class="px-3 py-1 rounded-full text-xs font-medium
                                     @if($application->status === 'approved') bg-green-100 text-green-800

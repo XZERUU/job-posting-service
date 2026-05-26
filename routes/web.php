@@ -33,11 +33,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/jobs', [JobController::class, 'store'])->name('jobs.store');
     });
 
-    Route::get('/jobs/{id}', [JobController::class, 'show'])->name('jobs.show');
+    Route::get('/jobs/{job}', [JobController::class, 'show'])->name('jobs.show');
+    Route::post('/jobs/{job}/apply', [ApplicationController::class, 'store'])->name('applications.store');
     Route::get('/applications', [ApplicationController::class, 'index'])->name('applications.index');
 
     // --- Job Seeker Profile ---
     Route::get('/profile', [ProfileController::class, 'show'])->name('seeker.profile');
+    Route::patch('/profile', [ProfileController::class, 'update']);
+    Route::delete('/profile', [ProfileController::class, 'destroy']);
 
     // --- Account Settings (Breeze) ---
     Route::prefix('settings')->group(function () {

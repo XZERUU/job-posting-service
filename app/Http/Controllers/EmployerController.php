@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Job;
 use App\Models\JobPost;
 use App\Models\Application;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class EmployerController extends Controller
@@ -15,12 +13,17 @@ class EmployerController extends Controller
         $user = Auth::user();
 
         // Get jobs posted by this employer
-        $jobs = JobPost::where('employer_id', $user->id)->latest()->get();
+        $jobs = JobPost::withCount('applications')
+            ->where('employer_id', $user->id)
+            ->latest()
+            ->get();
 
         $active_jobs_count = $jobs->count();
 
         // Get all applications for jobs posted by this employer
-        $applications = Application::whereIn('job_post_id', $jobs->pluck('id'))->get();
+        $applications = Application::with('user', 'jobPost')
+            ->whereIn('job_post_id', $jobs->pluck('id'))
+            ->get();
 
         $total_applications = $applications->count();
         $pending_applications = $applications->where('status', 'pending')->count();

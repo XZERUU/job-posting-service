@@ -12,7 +12,7 @@ class Application extends Model
     // Mass-assignable attributes
     protected $fillable = [
         'user_id',
-        'job_id',
+        'job_post_id',
         'cover_letter',
         'status',
     ];
@@ -21,9 +21,9 @@ class Application extends Model
     public $timestamps = true;
 
     // Relationships
-    public function job()
+    public function jobPost()
     {
-        return $this->belongsTo(JobPost::class, 'job_id');
+        return $this->belongsTo(JobPost::class);
     }
 
     public function user()

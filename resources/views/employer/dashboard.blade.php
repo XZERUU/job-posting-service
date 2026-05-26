@@ -91,9 +91,15 @@
                     <tbody>
                         @forelse($jobs ?? [] as $job)
                         <tr class="border-t border-gray-200 hover:bg-gray-50">
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $job->title ?? 'N/A' }}</td>
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $job->job_title ?? 'N/A' }}</td>
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $job->location ?? 'N/A' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-600">${{ number_format($job->salary ?? 0, 2) }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">
+                                @if($job->salary_min || $job->salary_max)
+                                    PHP {{ number_format($job->salary_min ?? 0) }} - {{ number_format($job->salary_max ?? 0) }}
+                                @else
+                                    Competitive
+                                @endif
+                            </td>
                             <td class="px-6 py-4 text-sm">
                                 <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                                     {{ $job->applications_count ?? 0 }}
@@ -137,7 +143,7 @@
                         @forelse($recent_applications ?? [] as $app)
                         <tr class="border-t border-gray-200 hover:bg-gray-50">
                             <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $app->user->name ?? 'N/A' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-600">{{ $app->jobPost->title ?? 'N/A' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">{{ $app->jobPost->job_title ?? 'N/A' }}</td>
                             <td class="px-6 py-4 text-sm">
                                 <span class="px-3 py-1 rounded-full text-xs font-medium
                                     @if($app->status === 'approved') bg-green-100 text-green-800

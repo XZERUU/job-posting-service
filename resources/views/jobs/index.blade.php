@@ -27,16 +27,22 @@
             @forelse($jobs as $job)
                 <div class="bg-white border border-gray-200 rounded-xl p-5 hover:border-green-300 hover:shadow-md transition-all group">
                     <div class="flex justify-between items-start mb-3">
-                        <h3 class="text-lg font-semibold text-gray-900 group-hover:text-green-700 transition">{{ $job->title }}</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 group-hover:text-green-700 transition">{{ $job->job_title }}</h3>
                         <span class="text-[10px] font-bold bg-green-50 text-green-700 px-2 py-1 rounded-full uppercase tracking-wider">
-                            {{ $job->type ?? 'Full-time' }}
+                            {{ $job->job_type ?? 'Full-time' }}
                         </span>
                     </div>
-                    <p class="text-sm text-gray-600 mb-1">{{ $job->employer->company_name }}</p>
+                    <p class="text-sm text-gray-600 mb-1">{{ $job->employer->name ?? 'Employer' }}</p>
                     <p class="text-xs text-gray-400 mb-4">{{ $job->location }}</p>
                     
                     <div class="pt-4 border-t border-gray-100 flex justify-between items-center">
-                        <span class="text-sm font-medium text-gray-900">{{ $job->salary ?? 'Competitive' }}</span>
+                        <span class="text-sm font-medium text-gray-900">
+                            @if($job->salary_min || $job->salary_max)
+                                PHP {{ number_format($job->salary_min ?? 0) }} - {{ number_format($job->salary_max ?? 0) }}
+                            @else
+                                Competitive
+                            @endif
+                        </span>
                         <a href="{{ route('jobs.show', $job->id) }}" 
                            class="text-sm text-green-700 font-medium hover:underline">View Details</a>
                     </div>

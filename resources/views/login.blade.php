@@ -65,17 +65,6 @@
                            placeholder="••••••••">
                 </div>
 
-                {{-- Role --}}
-                <div class="mb-4">
-                    <label for="role" class="block text-xs text-gray-500 mb-1">Login as</label>
-                    <select id="role" name="role"
-                            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
-                        <option value="job_seeker">Job seeker</option>
-                        <option value="employer">Employer</option>
-                        <option value="admin">PESO admin</option>
-                    </select>
-                </div>
-
                 {{-- Remember & Forgot --}}
                 <div class="flex items-center justify-between mb-5">
                     <label class="flex items-center gap-2 text-xs text-gray-500 cursor-pointer">

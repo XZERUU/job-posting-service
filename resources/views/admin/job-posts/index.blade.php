@@ -32,10 +32,16 @@
                     <tbody>
                         @forelse($job_posts as $post)
                         <tr class="border-t border-gray-200 hover:bg-gray-50">
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $post->title ?? 'N/A' }}</td>
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $post->job_title ?? 'N/A' }}</td>
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $post->employer->name ?? 'N/A' }}</td>
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $post->location ?? 'N/A' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-600">${{ number_format($post->salary ?? 0, 2) }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">
+                                @if($post->salary_min || $post->salary_max)
+                                    PHP {{ number_format($post->salary_min ?? 0) }} - {{ number_format($post->salary_max ?? 0) }}
+                                @else
+                                    Competitive
+                                @endif
+                            </td>
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $post->created_at->format('M d, Y') }}</td>
                             <td class="px-6 py-4 text-sm space-x-3">
                                 <form action="{{ route('admin.job-posts.destroy', $post) }}" method="POST" style="display:inline;">

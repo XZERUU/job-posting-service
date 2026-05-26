@@ -87,8 +87,8 @@
                     <label for="role" class="block text-xs text-gray-500 mb-1">Register as</label>
                     <select id="role" name="role"
                             class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
-                        <option value="job_seeker">Job seeker</option>
-                        <option value="employer">Employer</option>
+                        <option value="seeker" @selected(old('role') === 'seeker')>Job seeker</option>
+                        <option value="employer" @selected(old('role') === 'employer')>Employer</option>
                     </select>
                 </div>
 

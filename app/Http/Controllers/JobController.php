@@ -2,25 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Job;
 use App\Models\JobPost;
 use Illuminate\Http\Request;
 
 class JobController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Fetches all jobs from the database
-        $jobs = Job::latest()->paginate(9);
+        $jobs = JobPost::with('employer')
+            ->where('status', 'active')
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('job_title', 'like', "%{$search}%")
+                        ->orWhere('job_description', 'like', "%{$search}%")
+                        ->orWhere('location', 'like', "%{$search}%");
+                });
+            })
+            ->latest()
+            ->paginate(9)
+            ->withQueryString();
 
-        // Returns the view and passes the $jobs variable
         return view('jobs.index', compact('jobs'));
     }
 
-    public function show($id)
+    public function show(JobPost $job)
     {
-        // This will be useful when you create the job details page
-        $job = Job::findOrFail($id);
         return view('jobs.show', compact('job'));
     }
 

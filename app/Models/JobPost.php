@@ -27,12 +27,25 @@ class JobPost extends Model
 
     public $timestamps = true;
 
+    protected function casts(): array
+    {
+        return [
+            'posted_at' => 'datetime',
+            'closing_date' => 'datetime',
+        ];
+    }
+
     /**
      * Get the employer that posted the job.
      */
     public function employer(): BelongsTo
     {
-        return $this->belongsTo(Employer::class, 'employer_id');
+        return $this->belongsTo(User::class, 'employer_id');
+    }
+
+    public function applications(): HasMany
+    {
+        return $this->hasMany(Application::class);
     }
 
     /**
