@@ -118,7 +118,7 @@
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $job->created_at?->format('M d, Y') ?? 'N/A' }}</td>
                             <td class="px-6 py-4 text-sm space-x-3">
                                 <a href="{{ route('jobs.show', $job->id ?? '#') }}" class="text-blue-600 hover:text-blue-900 font-medium">View</a>
-                                <a href="#" class="text-green-600 hover:text-green-900 font-medium">Applications</a>
+                                <a href="{{ route('employer.applications') }}" class="text-green-600 hover:text-green-900 font-medium">Applications</a>
                             </td>
                         </tr>
                         @empty
@@ -165,7 +165,7 @@
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $app->created_at?->format('M d, Y') ?? 'N/A' }}</td>
                             <td class="px-6 py-4 text-sm">
-                                <a href="#" class="text-blue-600 hover:text-blue-900 font-medium">View</a>
+                                <a href="{{ route('employer.applications.show', $app) }}" class="text-blue-600 hover:text-blue-900 font-medium">View</a>
                             </td>
                         </tr>
                         @empty

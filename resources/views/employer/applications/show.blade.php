@@ -1,0 +1,55 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="py-12">
+    <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+        <div class="mb-8 flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Application Details</h1>
+                <p class="text-gray-600">Review the applicant information and submitted message.</p>
+            </div>
+            <a href="{{ route('employer.applications') }}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Back to Applications</a>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 space-y-6">
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900 mb-3">Applicant</h2>
+                <dl class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <dt class="text-gray-500">Name</dt>
+                        <dd class="mt-1 font-medium text-gray-900">{{ $application->user->name ?? 'N/A' }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-gray-500">Email</dt>
+                        <dd class="mt-1 font-medium text-gray-900">{{ $application->user->email ?? 'N/A' }}</dd>
+                    </div>
+                </dl>
+            </section>
+
+            <section class="border-t border-gray-200 pt-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-3">Job Applied For</h2>
+                <p class="text-sm font-medium text-gray-900">{{ $application->jobPost->job_title ?? 'N/A' }}</p>
+                <p class="text-sm text-gray-600">{{ $application->jobPost->location ?? 'N/A' }}</p>
+            </section>
+
+            <section class="border-t border-gray-200 pt-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-3">Cover Letter</h2>
+                <div class="rounded-lg bg-gray-50 p-4 text-sm leading-6 text-gray-700 whitespace-pre-line">
+                    {{ $application->cover_letter ?: 'No cover letter submitted.' }}
+                </div>
+            </section>
+
+            <section class="border-t border-gray-200 pt-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-3">Status</h2>
+                <span class="px-3 py-1 rounded-full text-xs font-medium
+                    @if($application->status === 'approved') bg-green-100 text-green-800
+                    @elseif($application->status === 'rejected') bg-red-100 text-red-800
+                    @else bg-yellow-100 text-yellow-800
+                    @endif">
+                    {{ ucfirst($application->status ?? 'pending') }}
+                </span>
+            </section>
+        </div>
+    </div>
+</div>
+@endsection

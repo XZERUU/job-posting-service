@@ -40,4 +40,27 @@ class EmployerController extends Controller
             'recent_applications'
         ));
     }
+
+    public function applications()
+    {
+        $jobIds = Auth::user()->jobPosts()->pluck('id');
+
+        $applications = Application::with('user', 'jobPost')
+            ->whereIn('job_post_id', $jobIds)
+            ->latest()
+            ->paginate(15);
+
+        return view('employer.applications.index', compact('applications'));
+    }
+
+    public function showApplication(Application $application)
+    {
+        if ($application->jobPost?->employer_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $application->load('user', 'jobPost');
+
+        return view('employer.applications.show', compact('application'));
+    }
 }

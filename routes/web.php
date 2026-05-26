@@ -53,6 +53,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // --- Employer Specific Routes ---
     Route::middleware('employer')->group(function () {
         Route::get('/employer/dashboard', [EmployerController::class, 'dashboard'])->name('employer.dashboard');
+        Route::get('/employer/applications', [EmployerController::class, 'applications'])->name('employer.applications');
+        Route::get('/employer/applications/{application}', [EmployerController::class, 'showApplication'])->name('employer.applications.show');
     });
 
     // --- Admin Specific Routes ---
