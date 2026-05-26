@@ -12,6 +12,7 @@ class Application extends Model
     // Mass-assignable attributes
     protected $fillable = [
         'user_id',
+        'job_id',
         'job_post_id',
         'cover_letter',
         'status',
