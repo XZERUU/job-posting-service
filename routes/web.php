@@ -55,6 +55,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/employer/dashboard', [EmployerController::class, 'dashboard'])->name('employer.dashboard');
         Route::get('/employer/applications', [EmployerController::class, 'applications'])->name('employer.applications');
         Route::get('/employer/applications/{application}', [EmployerController::class, 'showApplication'])->name('employer.applications.show');
+        Route::patch('/employer/applications/{application}/{status}', [EmployerController::class, 'updateApplicationStatus'])->name('employer.applications.update-status');
     });
 
     // --- Admin Specific Routes ---

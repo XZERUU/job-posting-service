@@ -59,8 +59,25 @@ class EmployerController extends Controller
             abort(403);
         }
 
-        $application->load('user', 'jobPost');
+        $application->load('user.seekerProfile', 'jobPost');
 
         return view('employer.applications.show', compact('application'));
+    }
+
+    public function updateApplicationStatus(Application $application, string $status)
+    {
+        if ($application->jobPost?->employer_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if (! in_array($status, ['approved', 'rejected'], true)) {
+            abort(404);
+        }
+
+        $application->update(['status' => $status]);
+
+        return redirect()
+            ->route('employer.applications.show', $application)
+            ->with('success', 'Application status updated.');
     }
 }

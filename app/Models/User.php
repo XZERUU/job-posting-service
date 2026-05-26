@@ -68,4 +68,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Application::class);
     }
+
+    public function seekerProfile()
+    {
+        return $this->hasOne(SeekerProfile::class);
+    }
 }

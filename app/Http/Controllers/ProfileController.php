@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -15,7 +16,7 @@ class ProfileController extends Controller
     public function show(): View
     {
         $user = Auth::user();
-        $profile = $user->profile ?? (object)[]; 
+        $profile = $user->seekerProfile ?? (object)[]; 
 
         return view('seeker-profile', [
             'user' => $user,
@@ -31,6 +32,7 @@ class ProfileController extends Controller
     {
         return view('profile.edit', [
             'user' => $request->user(),
+            'profile' => $request->user()->seekerProfile ?? (object) [],
         ]);
     }
 
@@ -55,16 +57,31 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
     
-    public function updateCustom(Request $request) {
-    $validated = $request->validate([
-        'phone' => 'nullable|string|max:20',
-        'headline' => 'nullable|string|max:255',
-        'resume' => 'nullable|file|mimes:pdf|max:2048',
-    ]);
+    public function updateCustom(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'phone' => 'nullable|string|max:20',
+            'headline' => 'nullable|string|max:255',
+            'resume' => 'nullable|file|mimes:pdf|max:2048',
+        ]);
 
-    // Logic to save the data to your 'profiles' table
-    // Logic to store the file (if it exists) using $request->file('resume')->store('resumes');
+        $profile = $request->user()->seekerProfile()->firstOrNew([
+            'user_id' => $request->user()->id,
+        ]);
 
-    return back()->with('status', 'profile-updated');
-}
+        $profile->phone = $validated['phone'] ?? null;
+        $profile->headline = $validated['headline'] ?? null;
+
+        if ($request->hasFile('resume')) {
+            if ($profile->resume_path) {
+                Storage::disk('public')->delete($profile->resume_path);
+            }
+
+            $profile->resume_path = $request->file('resume')->store('resumes', 'public');
+        }
+
+        $profile->save();
+
+        return back()->with('status', 'profile-updated');
+    }
 }
