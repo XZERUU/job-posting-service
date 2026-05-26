@@ -1,25 +1,21 @@
 <x-app-layout>
     <div class="p-6 max-w-7xl mx-auto space-y-6">
-
-        {{-- Header Section --}}
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-semibold text-gray-900">Welcome back, {{ auth()->user()->name ?? 'Juan' }}! 👋</h1>
+                <h1 class="text-2xl font-semibold text-gray-900">Welcome back, {{ auth()->user()->name ?? 'Juan' }}!</h1>
                 <p class="text-sm text-gray-500 mt-1">Here is what's happening with your job search today.</p>
             </div>
             <div class="flex items-center gap-3">
                 <a href="{{ Route::has('jobs.index') ? route('jobs.index') : '#' }}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-green-700 border border-transparent rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-green-100 transition-colors">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607"/>
                     </svg>
                     Find Jobs
                 </a>
             </div>
         </div>
 
-        {{-- Quick Stats (Application Tracking Service) --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {{-- Stat 1: Applied --}}
             <div class="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-sm transition-all">
                 <div class="flex items-center gap-4">
                     <div class="p-3 bg-green-50 text-green-600 rounded-lg">
@@ -28,13 +24,12 @@
                         </svg>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-gray-900">{{ $stats['applied'] ?? '0' }}</div>
+                        <div class="text-2xl font-bold text-gray-900">{{ $stats['applied'] ?? 0 }}</div>
                         <div class="text-sm text-gray-500 font-medium">Jobs Applied</div>
                     </div>
                 </div>
             </div>
 
-            {{-- Stat 2: In Progress/Review --}}
             <div class="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-sm transition-all">
                 <div class="flex items-center gap-4">
                     <div class="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
@@ -43,13 +38,12 @@
                         </svg>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-gray-900">{{ $stats['under_review'] ?? '0' }}</div>
+                        <div class="text-2xl font-bold text-gray-900">{{ $stats['under_review'] ?? 0 }}</div>
                         <div class="text-sm text-gray-500 font-medium">Under Review</div>
                     </div>
                 </div>
             </div>
 
-            {{-- Stat 3: Saved Jobs --}}
             <div class="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-sm transition-all">
                 <div class="flex items-center gap-4">
                     <div class="p-3 bg-lime-50 text-lime-600 rounded-lg">
@@ -58,25 +52,20 @@
                         </svg>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-gray-900">{{ $stats['saved'] ?? '0' }}</div>
-                        <div class="text-sm text-gray-500 font-medium">Saved Jobs</div>
+                        <div class="text-2xl font-bold text-gray-900">{{ $stats['hired'] ?? 0 }}</div>
+                        <div class="text-sm text-gray-500 font-medium">Hired</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            {{-- Main Column (Left) --}}
             <div class="lg:col-span-2 space-y-6">
-                
-                {{-- Recent Applications Table --}}
                 <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
                     <div class="px-5 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50/50">
                         <h2 class="text-sm font-semibold text-gray-800">Recent Applications</h2>
                         <a href="{{ Route::has('applications.index') ? route('applications.index') : '#' }}" class="text-sm text-green-700 hover:text-green-800 font-medium">View All</a>
                     </div>
-                    
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
@@ -90,18 +79,22 @@
                             <tbody class="divide-y divide-gray-100 text-sm">
                                 @forelse($recentApplications ?? [] as $app)
                                 <tr class="hover:bg-gray-50 transition-colors">
-                                    <td class="px-5 py-3 font-medium text-gray-900">{{ $app->job->title }}</td>
-                                    <td class="px-5 py-3 text-gray-600">{{ $app->job->employer->company_name }}</td>
+                                    <td class="px-5 py-3 font-medium text-gray-900">{{ $app->job_title }}</td>
+                                    <td class="px-5 py-3 text-gray-600">{{ $app->company_name }}</td>
                                     <td class="px-5 py-3">
                                         @if($app->status === 'pending')
                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">Pending</span>
-                                        @elseif($app->status === 'reviewing')
+                                        @elseif(in_array($app->status, ['reviewing', 'under_review']))
                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">Under Review</span>
                                         @elseif($app->status === 'interview')
                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-lime-100 text-lime-800">Interview</span>
+                                        @elseif(in_array($app->status, ['approved', 'hired']))
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800">Hired</span>
+                                        @else
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">{{ ucfirst($app->status) }}</span>
                                         @endif
                                     </td>
-                                    <td class="px-5 py-3 text-gray-500">{{ $app->created_at->format('M d, Y') }}</td>
+                                    <td class="px-5 py-3 text-gray-500">{{ \Carbon\Carbon::parse($app->created_at)->format('M d, Y') }}</td>
                                 </tr>
                                 @empty
                                 <tr>
@@ -120,80 +113,75 @@
                     </div>
                 </div>
 
-                {{-- Recommended Jobs --}}
                 <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
                     <div class="px-5 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50/50">
                         <div>
                             <h2 class="text-sm font-semibold text-gray-800">Recommended Jobs</h2>
-                            <p class="text-xs text-gray-400 mt-0.5">Based on your matched skills</p>
+                            <p class="text-xs text-gray-400 mt-0.5">Fresh active postings you have not applied to yet</p>
                         </div>
                     </div>
-                    
                     <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
                         @forelse($recommendedJobs ?? [] as $job)
                         <div class="border border-gray-100 rounded-lg p-4 hover:border-green-300 hover:shadow-sm transition-all group">
                             <div class="flex justify-between items-start mb-2">
-                                <h3 class="text-sm font-semibold text-gray-900 group-hover:text-green-600 transition-colors">{{ $job->title }}</h3>
-                                <span class="bg-green-50 text-green-700 text-[10px] px-2 py-1 rounded-full font-semibold">{{ $job->match_percentage }}% Match</span>
+                                <h3 class="text-sm font-semibold text-gray-900 group-hover:text-green-600 transition-colors">{{ $job->job_title }}</h3>
                             </div>
-                            <p class="text-xs text-gray-500 mb-3">{{ $job->employer->company_name }} • {{ $job->location }}</p>
+                            <p class="text-xs text-gray-500 mb-3">{{ $job->company_name }} - {{ $job->location }}</p>
                             <div class="flex gap-2">
                                 <a href="{{ Route::has('jobs.show') ? route('jobs.show', $job->id) : '#' }}" class="text-xs font-medium text-green-600 hover:text-green-800">View Details &rarr;</a>
                             </div>
                         </div>
                         @empty
                         <div class="col-span-2 py-6 text-center">
-                            <p class="text-sm text-gray-500">Update your profile skills to get better job recommendations.</p>
+                            <p class="text-sm text-gray-500">No available recommendations yet.</p>
                         </div>
                         @endforelse
                     </div>
                 </div>
-
             </div>
 
-            {{-- Sidebar Column (Right) --}}
             <div class="space-y-6">
-                
-                {{-- Profile Strength --}}
                 <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
                     <h2 class="text-sm font-semibold text-gray-800 mb-4">Profile Strength</h2>
-                    
-                    @php
-                        $profileCompletion = 75; 
-                    @endphp
-
                     <div class="flex justify-between items-end mb-2">
-                        <span class="text-3xl font-bold text-gray-900">{{ $profileCompletion }}%</span>
-                        <span class="text-xs font-medium text-green-600">Intermediate</span>
+                        <span class="text-3xl font-bold text-gray-900">{{ $profileCompletion ?? 0 }}%</span>
+                        <span class="text-xs font-medium text-green-600">
+                            @if(($profileCompletion ?? 0) >= 75)
+                                Strong
+                            @elseif(($profileCompletion ?? 0) >= 40)
+                                Intermediate
+                            @else
+                                Starter
+                            @endif
+                        </span>
                     </div>
-                    
                     <div class="w-full bg-gray-100 rounded-full h-2 mb-4">
-                        <div class="bg-green-600 h-2 rounded-full" style="width: {{ $profileCompletion }}%"></div>
+                        <div class="bg-green-600 h-2 rounded-full" style="width: {{ $profileCompletion ?? 0 }}%"></div>
                     </div>
-
-                    <p class="text-xs text-gray-500 mb-4">A complete profile increases your chances of getting hired by up to 40%.</p>
-                    
+                    <p class="text-xs text-gray-500 mb-4">A complete profile increases your chances of getting hired.</p>
                     <div class="space-y-2 mb-4">
-                        <div class="flex items-center text-sm gap-2 text-gray-400">
-                            <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                            <span class="line-through">Basic Information</span>
+                        <div class="flex items-center text-sm gap-2 {{ ($completionChecklist['basic_information'] ?? false) ? 'text-gray-400' : 'text-gray-700 font-medium' }}">
+                            <svg class="w-4 h-4 {{ ($completionChecklist['basic_information'] ?? false) ? 'text-green-500' : 'text-gray-300' }}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                            <span class="{{ ($completionChecklist['basic_information'] ?? false) ? 'line-through' : '' }}">Basic Information</span>
                         </div>
-                        <div class="flex items-center text-sm gap-2 text-gray-400">
-                            <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                            <span class="line-through">Education History</span>
+                        <div class="flex items-center text-sm gap-2 {{ ($completionChecklist['headline'] ?? false) ? 'text-gray-400' : 'text-gray-700 font-medium' }}">
+                            <svg class="w-4 h-4 {{ ($completionChecklist['headline'] ?? false) ? 'text-green-500' : 'text-gray-300' }}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                            <span class="{{ ($completionChecklist['headline'] ?? false) ? 'line-through' : '' }}">Professional Headline</span>
                         </div>
-                        <div class="flex items-center text-sm gap-2 text-gray-700 font-medium">
-                            <svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>
-                            <span>Add Work Experience</span>
+                        <div class="flex items-center text-sm gap-2 {{ ($completionChecklist['phone'] ?? false) ? 'text-gray-400' : 'text-gray-700 font-medium' }}">
+                            <svg class="w-4 h-4 {{ ($completionChecklist['phone'] ?? false) ? 'text-green-500' : 'text-gray-300' }}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                            <span class="{{ ($completionChecklist['phone'] ?? false) ? 'line-through' : '' }}">Phone Number</span>
+                        </div>
+                        <div class="flex items-center text-sm gap-2 {{ ($completionChecklist['resume'] ?? false) ? 'text-gray-400' : 'text-gray-700 font-medium' }}">
+                            <svg class="w-4 h-4 {{ ($completionChecklist['resume'] ?? false) ? 'text-green-500' : 'text-gray-300' }}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                            <span class="{{ ($completionChecklist['resume'] ?? false) ? 'line-through' : '' }}">Resume</span>
                         </div>
                     </div>
-
                     <a href="{{ Route::has('profile.edit') ? route('profile.edit') : '#' }}" class="block w-full py-2 px-4 border border-gray-200 text-center rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
                         Complete Profile
                     </a>
                 </div>
 
-                {{-- Quick Actions --}}
                 <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
                     <h2 class="text-sm font-semibold text-gray-800 mb-3">Quick Actions</h2>
                     <div class="space-y-2">
@@ -211,7 +199,6 @@
                         </a>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

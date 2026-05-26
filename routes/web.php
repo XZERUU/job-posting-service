@@ -5,6 +5,7 @@ use App\Http\Controllers\JobController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EmployerController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -21,7 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         if (auth()->user()->role === 'employer') {
             return redirect()->route('employer.dashboard');
         }
-        return view('dashboard', ['profile' => (object) []]);
+        return app(DashboardController::class)->index();
     })->name('dashboard');
 
     // --- Job Board Routes ---
@@ -33,17 +34,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/jobs', [JobController::class, 'store'])->name('jobs.store');
     });
 
-    Route::get('/jobs/{job}', [JobController::class, 'show'])->name('jobs.show');
-    Route::post('/jobs/{job}/apply', [ApplicationController::class, 'store'])->name('applications.store');
+    Route::get('/jobs/{id}', [JobController::class, 'show'])->name('jobs.show');
     Route::get('/applications', [ApplicationController::class, 'index'])->name('applications.index');
-    Route::get('/applications/{application}/edit', [ApplicationController::class, 'edit'])->name('applications.edit');
-    Route::patch('/applications/{application}', [ApplicationController::class, 'update'])->name('applications.update');
-    Route::delete('/applications/{application}', [ApplicationController::class, 'destroy'])->name('applications.destroy');
 
     // --- Job Seeker Profile ---
     Route::get('/profile', [ProfileController::class, 'show'])->name('seeker.profile');
-    Route::patch('/profile', [ProfileController::class, 'update']);
-    Route::delete('/profile', [ProfileController::class, 'destroy']);
 
     // --- Account Settings (Breeze) ---
     Route::prefix('settings')->group(function () {
@@ -51,15 +46,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
         Route::patch('/profile/custom', [ProfileController::class, 'updateCustom'])->name('profile.update-custom');
-        Route::patch('/profile/links', [ProfileController::class, 'updateLinks'])->name('profile.update-links');
     });
 
     // --- Employer Specific Routes ---
     Route::middleware('employer')->group(function () {
         Route::get('/employer/dashboard', [EmployerController::class, 'dashboard'])->name('employer.dashboard');
-        Route::get('/employer/applications', [EmployerController::class, 'applications'])->name('employer.applications');
-        Route::get('/employer/applications/{application}', [EmployerController::class, 'showApplication'])->name('employer.applications.show');
-        Route::patch('/employer/applications/{application}/{status}', [EmployerController::class, 'updateApplicationStatus'])->name('employer.applications.update-status');
     });
 
     // --- Admin Specific Routes ---
@@ -75,8 +66,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             // Job Posts Management
             Route::get('/job-posts', [AdminController::class, 'jobPosts'])->name('job-posts');
-            Route::patch('/job-posts/{jobPost}/approve', [AdminController::class, 'approveJobPost'])->name('job-posts.approve');
-            Route::patch('/job-posts/{jobPost}/reject', [AdminController::class, 'rejectJobPost'])->name('job-posts.reject');
             Route::delete('/job-posts/{jobPost}', [AdminController::class, 'destroyJobPost'])->name('job-posts.destroy');
 
             // Applications Management
