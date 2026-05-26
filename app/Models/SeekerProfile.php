@@ -12,6 +12,9 @@ class SeekerProfile extends Model
         'phone',
         'headline',
         'resume_path',
+        'linkedin_url',
+        'portfolio_url',
+        'github_url',
     ];
 
     public function user(): BelongsTo

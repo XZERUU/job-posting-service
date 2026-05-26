@@ -55,6 +55,26 @@
             </section>
 
             <section class="border-t border-gray-200 pt-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-3">Professional Links</h2>
+                @php($profile = $application->user->seekerProfile)
+                @if($profile?->linkedin_url || $profile?->portfolio_url || $profile?->github_url)
+                    <div class="flex flex-wrap gap-3 text-sm">
+                        @if($profile?->linkedin_url)
+                            <a href="{{ $profile->linkedin_url }}" target="_blank" class="text-blue-600 hover:underline">LinkedIn</a>
+                        @endif
+                        @if($profile?->portfolio_url)
+                            <a href="{{ $profile->portfolio_url }}" target="_blank" class="text-blue-600 hover:underline">Portfolio</a>
+                        @endif
+                        @if($profile?->github_url)
+                            <a href="{{ $profile->github_url }}" target="_blank" class="text-blue-600 hover:underline">GitHub</a>
+                        @endif
+                    </div>
+                @else
+                    <p class="text-sm text-gray-500">No professional links provided.</p>
+                @endif
+            </section>
+
+            <section class="border-t border-gray-200 pt-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-3">Resume</h2>
                 @if($application->user->seekerProfile?->resume_path)
                     <a href="{{ Storage::url($application->user->seekerProfile->resume_path) }}" target="_blank" class="inline-flex rounded-lg bg-green-700 px-4 py-2 text-sm font-medium text-white hover:bg-green-800">

@@ -84,4 +84,22 @@ class ProfileController extends Controller
 
         return back()->with('status', 'profile-updated');
     }
+
+    public function updateLinks(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'linkedin_url' => ['nullable', 'url', 'max:255'],
+            'portfolio_url' => ['nullable', 'url', 'max:255'],
+            'github_url' => ['nullable', 'url', 'max:255'],
+        ]);
+
+        $profile = $request->user()->seekerProfile()->firstOrNew([
+            'user_id' => $request->user()->id,
+        ]);
+
+        $profile->fill($validated);
+        $profile->save();
+
+        return back()->with('status', 'links-updated');
+    }
 }

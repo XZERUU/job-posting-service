@@ -51,6 +51,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
         Route::patch('/profile/custom', [ProfileController::class, 'updateCustom'])->name('profile.update-custom');
+        Route::patch('/profile/links', [ProfileController::class, 'updateLinks'])->name('profile.update-links');
     });
 
     // --- Employer Specific Routes ---
