@@ -12,8 +12,8 @@
         <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
             <form action="{{ route('jobs.index') }}" method="GET" class="flex flex-col md:flex-row gap-4">
                 <div class="flex-1">
-                    <input type="text" name="search" value="{{ request('search') }}" 
-                           placeholder="Search by job title or keyword..." 
+                    <input type="text" name="search" value="{{ $search ?? request('search') }}" 
+                           placeholder="Search by title, company, location, skill, or job type..." 
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500">
                 </div>
                 <button type="submit" class="px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition">
@@ -21,6 +21,25 @@
                 </button>
             </form>
         </div>
+
+        @if(($recommendedJobs ?? collect())->isNotEmpty())
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <h2 class="text-sm font-semibold text-gray-900">Suggested Jobs</h2>
+                        <p class="text-xs text-gray-500">Based on your profile headline and recent active postings.</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    @foreach($recommendedJobs as $recommended)
+                        <a href="{{ route('jobs.show', $recommended) }}" class="block rounded-lg border border-gray-100 p-3 hover:border-green-300 hover:bg-green-50 transition">
+                            <div class="text-sm font-medium text-gray-900">{{ $recommended->job_title }}</div>
+                            <div class="text-xs text-gray-500 mt-1">{{ $recommended->employer->name ?? 'Employer' }} · {{ $recommended->location }}</div>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @endif
 
         {{-- Job Listings Grid --}}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
