@@ -27,6 +27,16 @@ class JobController extends Controller
 
     public function show(JobPost $job)
     {
+        $user = auth()->user();
+
+        if (
+            $job->status !== 'active'
+            && $job->employer_id !== $user->id
+            && $user->role !== 'admin'
+        ) {
+            abort(404);
+        }
+
         return view('jobs.show', compact('job'));
     }
 
@@ -50,11 +60,11 @@ class JobController extends Controller
         ]);
 
         $validated['employer_id'] = auth()->id();
-        $validated['status'] = 'active';
+        $validated['status'] = 'pending';
         $validated['posted_at'] = now();
 
         JobPost::create($validated);
 
-        return redirect()->route('employer.dashboard')->with('success', 'Job posted successfully!');
+        return redirect()->route('employer.dashboard')->with('success', 'Job submitted for admin review.');
     }
 }

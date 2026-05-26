@@ -18,7 +18,7 @@ class EmployerController extends Controller
             ->latest()
             ->get();
 
-        $active_jobs_count = $jobs->count();
+        $active_jobs_count = $jobs->where('status', 'active')->count();
 
         // Get all applications for jobs posted by this employer
         $applications = Application::with('user', 'jobPost')

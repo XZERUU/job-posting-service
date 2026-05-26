@@ -68,6 +68,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             // Job Posts Management
             Route::get('/job-posts', [AdminController::class, 'jobPosts'])->name('job-posts');
+            Route::patch('/job-posts/{jobPost}/approve', [AdminController::class, 'approveJobPost'])->name('job-posts.approve');
+            Route::patch('/job-posts/{jobPost}/reject', [AdminController::class, 'rejectJobPost'])->name('job-posts.reject');
             Route::delete('/job-posts/{jobPost}', [AdminController::class, 'destroyJobPost'])->name('job-posts.destroy');
 
             // Applications Management

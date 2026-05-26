@@ -74,8 +74,26 @@ class AdminController extends Controller
      */
     public function jobPosts()
     {
-        $job_posts = JobPost::with('employer')->paginate(15);
+        $job_posts = JobPost::with('employer')
+            ->orderByRaw("case when status = 'pending' then 0 when status = 'active' then 1 else 2 end")
+            ->latest()
+            ->paginate(15);
+
         return view('admin.job-posts.index', compact('job_posts'));
+    }
+
+    public function approveJobPost(JobPost $jobPost)
+    {
+        $jobPost->update(['status' => 'active']);
+
+        return redirect()->route('admin.job-posts')->with('success', 'Job post approved successfully.');
+    }
+
+    public function rejectJobPost(JobPost $jobPost)
+    {
+        $jobPost->update(['status' => 'rejected']);
+
+        return redirect()->route('admin.job-posts')->with('success', 'Job post rejected successfully.');
     }
 
     /**

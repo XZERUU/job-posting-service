@@ -83,6 +83,7 @@
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Job Title</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Location</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Salary</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Applications</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Posted</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
@@ -101,6 +102,15 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-sm">
+                                <span class="px-3 py-1 rounded-full text-xs font-medium
+                                    @if($job->status === 'active') bg-green-100 text-green-800
+                                    @elseif($job->status === 'rejected') bg-red-100 text-red-800
+                                    @else bg-yellow-100 text-yellow-800
+                                    @endif">
+                                    {{ ucfirst($job->status ?? 'pending') }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm">
                                 <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                                     {{ $job->applications_count ?? 0 }}
                                 </span>
@@ -113,7 +123,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                            <td colspan="7" class="px-6 py-8 text-center text-gray-500">
                                 No job postings yet. <a href="{{ route('jobs.create') }}" class="text-blue-600 hover:text-blue-900">Create your first job post</a>
                             </td>
                         </tr>
