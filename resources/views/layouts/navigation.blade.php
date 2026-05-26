@@ -9,17 +9,37 @@
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                    
-                    <x-nav-link :href="route('jobs.index')" :active="request()->routeIs('jobs.index')">
-                        {{ __('Find Jobs') }}
-                    </x-nav-link>
-
-                    <x-nav-link :href="route('applications.index')" :active="request()->routeIs('applications.index')">
-                        {{ __('My Applications') }}
-                    </x-nav-link>
+                    @if(auth()->user()->role === 'admin')
+                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('admin.users')" :active="request()->routeIs('admin.users*')">
+                            {{ __('Users') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('admin.job-posts')" :active="request()->routeIs('admin.job-posts*')">
+                            {{ __('Job Posts') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('admin.applications')" :active="request()->routeIs('admin.applications')">
+                            {{ __('Applications') }}
+                        </x-nav-link>
+                    @elseif(auth()->user()->role === 'employer')
+                        <x-nav-link :href="route('employer.dashboard')" :active="request()->routeIs('employer.dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('jobs.create')" :active="request()->routeIs('jobs.create')">
+                            {{ __('Post Job') }}
+                        </x-nav-link>
+                    @else
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('jobs.index')" :active="request()->routeIs('jobs.index')">
+                            {{ __('Find Jobs') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('applications.index')" :active="request()->routeIs('applications.index')">
+                            {{ __('My Applications') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -37,7 +57,9 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('seeker.profile')">{{ __('My Profile') }}</x-dropdown-link>
+                        @if(auth()->user()->role === 'seeker')
+                            <x-dropdown-link :href="route('seeker.profile')">{{ __('My Profile') }}</x-dropdown-link>
+                        @endif
                         <x-dropdown-link :href="route('profile.edit')">{{ __('Account Settings') }}</x-dropdown-link>
                         
                         <form method="POST" action="{{ route('logout') }}">
@@ -65,8 +87,19 @@
 
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">{{ __('Dashboard') }}</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('jobs.index')" :active="request()->routeIs('jobs.index')">{{ __('Find Jobs') }}</x-responsive-nav-link>
+            @if(auth()->user()->role === 'admin')
+                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">{{ __('Dashboard') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.users')" :active="request()->routeIs('admin.users*')">{{ __('Users') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.job-posts')" :active="request()->routeIs('admin.job-posts*')">{{ __('Job Posts') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.applications')" :active="request()->routeIs('admin.applications')">{{ __('Applications') }}</x-responsive-nav-link>
+            @elseif(auth()->user()->role === 'employer')
+                <x-responsive-nav-link :href="route('employer.dashboard')" :active="request()->routeIs('employer.dashboard')">{{ __('Dashboard') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('jobs.create')" :active="request()->routeIs('jobs.create')">{{ __('Post Job') }}</x-responsive-nav-link>
+            @else
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">{{ __('Dashboard') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('jobs.index')" :active="request()->routeIs('jobs.index')">{{ __('Find Jobs') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('applications.index')" :active="request()->routeIs('applications.index')">{{ __('My Applications') }}</x-responsive-nav-link>
+            @endif
         </div>
     </div>
 </nav>
