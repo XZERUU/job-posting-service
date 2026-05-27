@@ -58,13 +58,13 @@ export default function ManageJobSeekers() {
       isReady ? 'Mark as Referral-Ready' : 'Request Revision',
       isReady
         ? `Mark "${seeker.first_name} ${seeker.last_name}" as PESO Referral-Ready?`
-        : `Request NSRP revisions from "${seeker.first_name} ${seeker.last_name}"?`,
+        : `Request profile revisions from "${seeker.first_name} ${seeker.last_name}"?`,
       async () => {
         setBusyId(seeker.id);
         try {
           await api.put(`/admin/job-seekers/${seeker.id}/referral-status`, {
             referral_status: referralStatus,
-            notes: isReady ? null : 'Please review and correct incomplete, invalid, or inappropriate NSRP information.',
+            notes: isReady ? null : 'Please review and correct incomplete, invalid, or inappropriate profile information.',
           });
           await load();
         } catch (err) {
@@ -83,7 +83,7 @@ export default function ManageJobSeekers() {
       <View style={styles.header}>
         <Text style={styles.kicker}>PESO-Link MisOr</Text>
         <Text style={styles.headerTitle}>Job Seekers</Text>
-        <Text style={styles.headerSub}>Review NSRP profiles and referral-ready status</Text>
+        <Text style={styles.headerSub}>Review profiles and referral-ready status</Text>
       </View>
       <FlatList
         data={seekers}

@@ -84,7 +84,7 @@ export default function AdminDashboard() {
         <Text style={styles.sectionTitle}>Management</Text>
         <View style={styles.actionList}>
           <ActionButton testID="admin-manage-emp" label="Manage Employers" detail="Create and monitor employer accounts" onPress={() => router.push('/(admin)/manage-employers')} />
-          <ActionButton testID="admin-manage-seekers" label="Manage Job Seekers" detail="Review NSRP and referral-ready status" onPress={() => router.push('/(admin)/manage-job-seekers')} />
+          <ActionButton testID="admin-manage-seekers" label="Manage Job Seekers" detail="Review profile and referral-ready status" onPress={() => router.push('/(admin)/manage-job-seekers')} />
           <ActionButton testID="admin-jobs" label="Monitor Job Posts" detail="View active and closed job posts" onPress={() => router.push('/(admin)/monitor-jobs')} />
           <ActionButton testID="admin-apps" label="Monitor Applications" detail="Read-only application tracking" onPress={() => router.push('/(admin)/monitor-apps')} />
         </View>
@@ -92,7 +92,7 @@ export default function AdminDashboard() {
         <View style={styles.noteCard}>
           <Text style={styles.noteTitle}>Scope Reminder</Text>
           <Text style={styles.noteText}>
-            OCR is optional and assistive. PESO Referral-Ready means the NSRP profile was reviewed for referral support.
+            PESO Referral-Ready means the profile was reviewed for referral support.
             Skill comparison remains rule-based only and does not make hiring decisions.
           </Text>
         </View>

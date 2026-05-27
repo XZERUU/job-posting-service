@@ -29,3 +29,6 @@ mobile/.expo
 mobile/.env
 mobile/dist
 mobile/web-build
+
+# Mobile / Expo cache
+mobile/.metro-cache

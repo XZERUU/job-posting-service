@@ -209,7 +209,6 @@ export default function ProfileScreen() {
               {getReferralHelp(referralStatus)}
             </Text>
             {!!reviewNotes && <Text style={styles.reviewNotes}>PESO note: {reviewNotes}</Text>}
-            <Button testID="profile-upload-shortcut" title="Use OCR Assistant" variant="secondary" onPress={() => router.push('/(seeker)/upload-nsrp')} />
           </Card>
 
           <ProfileSection title="Personal Information">

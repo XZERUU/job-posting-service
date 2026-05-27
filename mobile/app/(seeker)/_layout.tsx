@@ -13,8 +13,7 @@ export default function SeekerLayout() {
       }}
     >
       <Stack.Screen name="dashboard" options={{ title: 'My Dashboard' }} />
-      <Stack.Screen name="profile" options={{ title: 'NSRP Profile' }} />
-      <Stack.Screen name="upload-nsrp" options={{ title: 'Upload NSRP Form' }} />
+      <Stack.Screen name="profile" options={{ title: 'My Profile' }} />
       <Stack.Screen name="jobs" options={{ title: 'Browse Jobs' }} />
       <Stack.Screen name="job/[id]" options={{ title: 'Job Details' }} />
       <Stack.Screen name="my-applications" options={{ title: 'My Applications' }} />
