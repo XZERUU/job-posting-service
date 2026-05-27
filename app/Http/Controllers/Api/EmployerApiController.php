@@ -49,7 +49,7 @@ class EmployerApiController extends Controller
         ]);
 
         $validated['employer_id'] = $request->user()->id;
-        $validated['status'] = 'active'; // Default active for simplicity, instead of pending
+        $validated['status'] = 'pending';
         $validated['posted_at'] = now();
 
         DB::beginTransaction();
