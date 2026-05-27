@@ -22,3 +22,10 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Mobile / Expo
+mobile/node_modules
+mobile/.expo
+mobile/.env
+mobile/dist
+mobile/web-build
