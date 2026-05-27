@@ -6,9 +6,9 @@ import {
   View, Text, StyleSheet, FlatList, RefreshControl, Alert, TouchableOpacity,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
-import { Button, EmptyState } from '../../src/components/ui';
+import { Button, EmptyState, StatusBadge } from '../../src/components/ui';
 import { api, getApiError } from '../../src/api/client';
-import { Colors, Spacing, FontSize, Radius, Shadow } from '../../src/constants/theme';
+import { Colors, Spacing, FontSize, Radius, Shadow, JobStatusLabels } from '../../src/constants/theme';
 
 export default function ManageJobs() {
   const router = useRouter();
@@ -75,9 +75,7 @@ export default function ManageJobs() {
                 <Text style={styles.meta}>{item.job_type} / {item.location || 'N/A'}</Text>
                 <Text style={styles.meta}>{item.applicant_count || 0} applicant{item.applicant_count === 1 ? '' : 's'}</Text>
               </View>
-              <View style={[styles.statusPill, item.status === 'active' ? styles.statusActive : styles.statusInactive]}>
-                <Text style={styles.statusText}>{item.status}</Text>
-              </View>
+              <StatusBadge status={item.status} label={JobStatusLabels[item.status as keyof typeof JobStatusLabels]} />
             </View>
 
             <View style={styles.actionRow}>
@@ -132,10 +130,6 @@ const styles = StyleSheet.create({
   jobHeader: { flexDirection: 'row', alignItems: 'flex-start' },
   title: { fontSize: FontSize.md, fontWeight: '900', color: Colors.textDark },
   meta: { fontSize: FontSize.sm, color: Colors.gray, marginTop: 4, textTransform: 'capitalize' },
-  statusPill: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: Radius.pill },
-  statusActive: { backgroundColor: Colors.cardHighlight },
-  statusInactive: { backgroundColor: Colors.muted },
-  statusText: { color: Colors.primary, fontSize: FontSize.xs, fontWeight: '900', textTransform: 'uppercase' },
   actionRow: { flexDirection: 'row', gap: Spacing.sm, marginTop: Spacing.md },
   linkButton: {
     flex: 1,

@@ -10,7 +10,7 @@ import { Card, Button, StatusBadge, EmptyState, Row } from '../../src/components
 import { api, getApiError } from '../../src/api/client';
 import { Colors, Spacing, FontSize, Radius, Shadow, StatusLabels } from '../../src/constants/theme';
 
-const STATUSES = ['for_review', 'for_interview', 'hired', 'rejected'] as const;
+const STATUSES = ['for_review', 'approved', 'rejected'] as const;
 
 export default function Applicants() {
   const { jobId, jobTitle } = useLocalSearchParams<{ jobId: string; jobTitle: string }>();
@@ -82,7 +82,7 @@ export default function Applicants() {
           <View style={styles.modalCard}>
             <ScrollView>
               <Text style={styles.modalTitle}>Applicant Details</Text>
-              <Text style={styles.modalSubtle}>Review NSRP profile summary before updating the application status.</Text>
+              <Text style={styles.modalSubtle}>Review profile summary before updating the application status.</Text>
               {selected && (
                 <>
                   <Row left="Name" right={`${selected.first_name} ${selected.last_name}`} />

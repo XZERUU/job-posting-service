@@ -4,7 +4,7 @@
 // ============================================================
 import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert,
+  View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert, TouchableOpacity,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Button, Input, Card } from '../src/components/ui';
@@ -15,12 +15,12 @@ import { Colors, Spacing, FontSize, Radius } from '../src/constants/theme';
 export default function Register() {
   const router = useRouter();
   const { login } = useAuth();
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [contact, setContact] = useState('');
+  const [role, setRole] = useState<'job_seeker' | 'employer'>('job_seeker');
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
@@ -46,11 +46,14 @@ export default function Register() {
       const res = await api.post('/auth/register', {
         email: email.trim(),
         password,
-        role: 'job_seeker',
-        profile: { first_name: firstName, last_name: lastName, contact_number: contact },
+        role: role,
+        profile: { first_name: firstName, last_name: lastName },
       });
       await login(res.data.token, res.data.user);
-      router.replace('/(seeker)/dashboard');
+      const userRole = res.data.user.role;
+      if (userRole === 'job_seeker') router.replace('/(seeker)/dashboard');
+      else if (userRole === 'employer') router.replace('/(employer)/dashboard');
+      else router.replace('/(admin)/dashboard');
     } catch (err: any) {
       Alert.alert('Registration Failed', getApiError(err));
     } finally {
@@ -65,33 +68,35 @@ export default function Register() {
     >
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <View style={styles.topBlock}>
-          <Text style={styles.kicker}>JOB SEEKER REGISTRATION</Text>
           <Text style={styles.title}>Create account</Text>
           <Text style={styles.subtitle}>Register to access PESO-Link MisOr job opportunities.</Text>
         </View>
 
         <View style={styles.sheet}>
-          <Card style={styles.noticeCard} testID="employer-notice">
-            <Text style={styles.noticeTitle}>Employer Accounts</Text>
-            <Text style={styles.noticeText}>
-              Employer accounts are created by PESO Admin only. If you represent a company,
-              please contact your local PESO Misamis Oriental office to request an account.
-            </Text>
-          </Card>
 
-          <Input testID="reg-email" label="Email" value={email} onChangeText={setEmail} placeholder="you@example.com" keyboardType="email-address" />
-          <Input testID="reg-password" label="Password (min 6 chars)" value={password} onChangeText={setPassword} secureTextEntry placeholder="Enter password" />
-          <Input testID="reg-confirm" label="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry placeholder="Confirm password" />
           <View style={styles.nameRow}>
             <View style={{ flex: 1 }}>
-              <Input testID="reg-firstname" label="First Name" value={firstName} onChangeText={setFirstName} placeholder="Juan" autoCapitalize="words" />
+              <Input testID="reg-firstname" label="First name" value={firstName} onChangeText={setFirstName} placeholder="Juan" autoCapitalize="words" />
             </View>
             <View style={{ width: Spacing.sm }} />
             <View style={{ flex: 1 }}>
-              <Input testID="reg-lastname" label="Last Name" value={lastName} onChangeText={setLastName} placeholder="Cruz" autoCapitalize="words" />
+              <Input testID="reg-lastname" label="Last name" value={lastName} onChangeText={setLastName} placeholder="dela Cruz" autoCapitalize="words" />
             </View>
           </View>
-          <Input testID="reg-contact" label="Contact Number" value={contact} onChangeText={setContact} placeholder="09xx xxx xxxx" keyboardType="phone-pad" />
+
+          <Input testID="reg-email" label="Email address" value={email} onChangeText={setEmail} placeholder="you@example.com" keyboardType="email-address" />
+          <Input testID="reg-password" label="Password" value={password} onChangeText={setPassword} secureTextEntry placeholder="••••••••" />
+          <Input testID="reg-confirm" label="Confirm password" value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry placeholder="••••••••" />
+          
+          <Text style={styles.label}>Register as</Text>
+          <View style={styles.segment}>
+            <TouchableOpacity onPress={() => setRole('job_seeker')} activeOpacity={0.8} style={[styles.segmentItem, role === 'job_seeker' && styles.segmentActive, { borderTopLeftRadius: Radius.sm, borderBottomLeftRadius: Radius.sm, zIndex: role === 'job_seeker' ? 1 : 0 }]}>
+              <Text style={[styles.segmentText, role === 'job_seeker' && styles.segmentTextActive]}>Job seeker</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setRole('employer')} activeOpacity={0.8} style={[styles.segmentItem, role === 'employer' && styles.segmentActive, { borderTopRightRadius: Radius.sm, borderBottomRightRadius: Radius.sm, marginLeft: -1, zIndex: role === 'employer' ? 1 : 0 }]}>
+              <Text style={[styles.segmentText, role === 'employer' && styles.segmentTextActive]}>Employer</Text>
+            </TouchableOpacity>
+          </View>
 
           <Button testID="reg-submit" title="Create Account" onPress={handleRegister} loading={loading} style={{ marginTop: Spacing.sm }} />
 
@@ -123,10 +128,13 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     marginTop: -Spacing.md,
   },
-  noticeCard: { backgroundColor: Colors.cardHighlight, borderColor: Colors.border },
-  noticeTitle: { fontSize: FontSize.sm, fontWeight: '800', color: Colors.primary, marginBottom: 6 },
-  noticeText: { fontSize: FontSize.sm, color: Colors.textDark, lineHeight: 20 },
   nameRow: { flexDirection: 'row' },
+  label: { fontSize: FontSize.sm, fontWeight: '700', color: Colors.textDark, marginBottom: 6 },
+  segment: { flexDirection: 'row', marginBottom: Spacing.md },
+  segmentItem: { flex: 1, paddingVertical: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: Colors.borderSoft, backgroundColor: Colors.white },
+  segmentActive: { borderColor: Colors.primary, backgroundColor: Colors.cardHighlight },
+  segmentText: { color: Colors.gray, fontSize: FontSize.sm, fontWeight: '700' },
+  segmentTextActive: { color: Colors.primaryDark },
   linkText: { textAlign: 'center', color: Colors.textDark, fontSize: FontSize.sm, marginTop: Spacing.lg },
   link: { color: Colors.primary, fontWeight: '800' },
 });

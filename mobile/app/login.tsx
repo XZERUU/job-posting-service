@@ -14,7 +14,6 @@ import { Colors, Spacing, FontSize, Radius } from '../src/constants/theme';
 export default function Login() {
   const router = useRouter();
   const { login } = useAuth();
-  const [loginMode, setLoginMode] = useState<'Job Seeker' | 'Employer' | 'Admin'>('Job Seeker');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -52,26 +51,6 @@ export default function Login() {
         </View>
 
         <View style={styles.sheet}>
-          <View style={styles.segment}>
-            {(['Job Seeker', 'Employer', 'Admin'] as const).map((mode) => (
-              <TouchableOpacity
-                key={mode}
-                testID={`login-mode-${mode.toLowerCase().replace(' ', '-')}`}
-                onPress={() => setLoginMode(mode)}
-                activeOpacity={0.75}
-                style={[styles.segmentItem, loginMode === mode && styles.segmentActive]}
-              >
-                <Text style={[styles.segmentText, loginMode === mode && styles.segmentTextActive]}>{mode}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-          <Text style={styles.modeNote}>
-            {loginMode === 'Job Seeker'
-              ? 'Use your registered job seeker account.'
-              : loginMode === 'Employer'
-                ? 'Employer accounts are created by PESO Admin.'
-                : 'PESO Admin access only.'}
-          </Text>
 
           <Input
             testID="login-email"
@@ -101,13 +80,6 @@ export default function Login() {
           <Text style={styles.linkText} onPress={() => router.push('/register')} testID="go-register">
             New job seeker? <Text style={styles.link}>Create an account</Text>
           </Text>
-
-          <Card style={styles.demoCard}>
-            <Text style={styles.demoTitle}>Demo Accounts</Text>
-            <Text style={styles.demoLine}>Admin: admin@peso.gov.ph / Admin@123</Text>
-            <Text style={styles.demoLine}>Seeker: juan.cruz@example.com / Test@123</Text>
-            <Text style={styles.demoLine}>Employer: hr@techcorp.ph / Test@123</Text>
-          </Card>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -133,36 +105,6 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     marginTop: -Spacing.md,
   },
-  segment: {
-    flexDirection: 'row',
-    backgroundColor: Colors.cardHighlight,
-    borderRadius: Radius.md,
-    padding: 4,
-    marginBottom: Spacing.sm,
-  },
-  segmentItem: {
-    flex: 1,
-    paddingVertical: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: Radius.sm,
-  },
-  segmentActive: {
-    backgroundColor: Colors.white,
-  },
-  segmentText: {
-    color: Colors.gray,
-    fontSize: FontSize.xs,
-    fontWeight: '800',
-    textAlign: 'center',
-  },
-  segmentTextActive: {
-    color: Colors.primaryDark,
-  },
-  modeNote: { color: Colors.gray, fontSize: FontSize.xs, marginBottom: Spacing.lg, lineHeight: 16 },
   linkText: { textAlign: 'center', color: Colors.textDark, fontSize: FontSize.sm, marginTop: Spacing.lg },
   link: { color: Colors.primary, fontWeight: '800' },
-  demoCard: { marginTop: Spacing.xl, backgroundColor: Colors.white },
-  demoTitle: { fontSize: FontSize.sm, fontWeight: '800', color: Colors.primary, marginBottom: 6 },
-  demoLine: { fontSize: FontSize.xs, color: Colors.gray, marginBottom: 2, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
 });

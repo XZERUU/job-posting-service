@@ -172,7 +172,7 @@ class EmployerApiController extends Controller
     public function updateApplicationStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|string'
+            'status' => 'required|string|in:approved,rejected',
         ]);
 
         $application = Application::whereHas('jobPost', function ($query) use ($request) {

@@ -93,8 +93,8 @@
                                     <td class="px-5 py-3 font-medium text-gray-900">{{ $app->job->title }}</td>
                                     <td class="px-5 py-3 text-gray-600">{{ $app->job->employer->company_name }}</td>
                                     <td class="px-5 py-3">
-                                        @if($app->status === 'pending')
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">Pending</span>
+                                        @if(in_array($app->status, ['pending', 'for_review'], true))
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">For Review</span>
                                         @elseif($app->status === 'reviewing')
                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">Under Review</span>
                                         @elseif($app->status === 'interview')

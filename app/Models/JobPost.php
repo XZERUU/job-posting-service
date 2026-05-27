@@ -27,6 +27,17 @@ class JobPost extends Model
 
     public $timestamps = true;
 
+    public function getStatusLabelAttribute(): string
+    {
+        return match ($this->status) {
+            'pending' => 'Pending Approval',
+            'active' => 'Active',
+            'rejected' => 'Rejected',
+            'closed' => 'Closed',
+            default => ucwords(str_replace('_', ' ', (string) $this->status)),
+        };
+    }
+
     protected function casts(): array
     {
         return [

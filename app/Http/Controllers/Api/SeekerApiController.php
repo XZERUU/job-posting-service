@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\SeekerProfile;
 use App\Models\Skill;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class SeekerApiController extends Controller
 {
@@ -14,45 +17,25 @@ class SeekerApiController extends Controller
         $user = $request->user();
         $profile = $user->seekerProfile;
 
-        // Split name into first and last name for mobile compatibility
-        $nameParts = explode(' ', $user->name, 2);
-        $firstName = $nameParts[0];
-        $lastName = $nameParts[1] ?? '';
-
-        $locationParts = explode(',', (string) ($profile->location ?? ''));
-        $city = trim($locationParts[0] ?? '');
-        $province = trim($locationParts[1] ?? '');
-
-        // Extract from JSON fields if they exist
-        $education = is_array($profile->education) ? $profile->education : [];
-        $experiences = is_array($profile->experiences) ? $profile->experiences : [];
-
         $profileData = [
-            'first_name' => $firstName,
-            'last_name' => $lastName,
+            'name' => $user->name,
             'email' => $user->email,
-            'contact_number' => $profile->phone ?? '',
-            'city' => $city,
-            'province' => $province,
-            'education_level' => $education['level'] ?? '',
-            'course' => $education['course'] ?? '',
-            'years_of_experience' => $experiences['years'] ?? 0,
-            'employment_status' => $profile->about ?? '', // Mapping this loosely
-            'preferred_occupation' => $profile->headline ?? '',
-            // Fake these since they aren't in the DB schema
+            'phone' => $profile->phone ?? '',
+            'location' => $profile->location ?? '',
+            'headline' => $profile->headline ?? '',
+            'about' => $profile->about ?? '',
+            'education' => is_array($profile->education) ? $profile->education : [],
+            'experiences' => is_array($profile->experiences) ? $profile->experiences : [],
+            'linkedin_url' => $profile->linkedin_url ?? '',
+            'portfolio_url' => $profile->portfolio_url ?? '',
+            'github_url' => $profile->github_url ?? '',
+            'resume_path' => $profile->resume_path ? Storage::url($profile->resume_path) : null,
             'profile_completed' => !empty($profile->phone) && !empty($profile->location),
-            'referral_status' => 'referral_ready',
         ];
 
-        // Format skills to an array of objects for mobile
         $skills = [];
         if ($profile && is_array($profile->skills)) {
-            foreach ($profile->skills as $i => $skillName) {
-                $skills[] = [
-                    'id' => $i + 1,
-                    'skill_name' => $skillName
-                ];
-            }
+            $skills = $profile->skills;
         }
 
         return response()->json([
@@ -66,31 +49,51 @@ class SeekerApiController extends Controller
         $user = $request->user();
         $profile = $user->seekerProfile ?? new SeekerProfile(['user_id' => $user->id]);
 
-        $firstName = $request->input('first_name', '');
-        $lastName = $request->input('last_name', '');
-        
-        $user->name = trim("$firstName $lastName");
-        $user->save();
-
-        $profile->phone = $request->input('contact_number', $profile->phone);
-        
-        $city = $request->input('city', '');
-        $province = $request->input('province', '');
-        if ($city || $province) {
-            $profile->location = trim("$city, $province", ", ");
+        if ($request->has('name')) {
+            $user->name = $request->input('name');
+            $user->save();
         }
 
-        $profile->headline = $request->input('preferred_occupation', $profile->headline);
-        $profile->about = $request->input('employment_status', $profile->about);
+        $profile->phone = $request->input('phone', $profile->phone);
+        $profile->location = $request->input('location', $profile->location);
+        $profile->headline = $request->input('headline', $profile->headline);
+        $profile->about = $request->input('about', $profile->about);
         
-        $profile->education = [
-            'level' => $request->input('education_level', ''),
-            'course' => $request->input('course', ''),
-        ];
+        // Mobile sends these as JSON strings if using FormData, or arrays if using JSON.
+        $education = $request->input('education', $profile->education);
+        if (is_string($education)) {
+            $education = json_decode($education, true);
+        }
+        $profile->education = is_array($education) ? $education : [];
 
-        $profile->experiences = [
-            'years' => $request->input('years_of_experience', 0),
-        ];
+        $experiences = $request->input('experiences', $profile->experiences);
+        if (is_string($experiences)) {
+            $experiences = json_decode($experiences, true);
+        }
+        $profile->experiences = is_array($experiences) ? $experiences : [];
+
+        $profile->linkedin_url = $request->input('linkedin_url', $profile->linkedin_url);
+        $profile->portfolio_url = $request->input('portfolio_url', $profile->portfolio_url);
+        $profile->github_url = $request->input('github_url', $profile->github_url);
+        
+        $skillsInput = $request->input('skills', []);
+        if (is_string($skillsInput)) {
+            $skillsInput = json_decode($skillsInput, true);
+        }
+        $profile->skills = is_array($skillsInput) ? $skillsInput : [];
+
+        if ($request->hasFile('resume')) {
+            $request->validate([
+                'resume' => 'file|mimes:pdf|max:2048',
+            ]);
+            
+            if ($profile->resume_path) {
+                Storage::disk('public')->delete($profile->resume_path);
+            }
+            
+            $path = $request->file('resume')->store('resumes', 'public');
+            $profile->resume_path = $path;
+        }
 
         $profile->save();
 
@@ -99,37 +102,39 @@ class SeekerApiController extends Controller
         ]);
     }
 
-    public function updateSkills(Request $request)
+    public function updatePassword(Request $request)
+    {
+        $validated = $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'min:8', 'confirmed'],
+        ]);
+
+        $request->user()->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        return response()->json(['message' => 'Password updated successfully']);
+    }
+
+    public function deleteAccount(Request $request)
     {
         $user = $request->user();
-        $profile = $user->seekerProfile ?? new SeekerProfile(['user_id' => $user->id]);
-
-        // Mobile sends an array of skill objects, we just need the names
-        $skillNames = [];
-        $skillsInput = $request->input('skills', []);
         
-        foreach ($skillsInput as $sk) {
-            if (isset($sk['skill_name'])) {
-                $skillNames[] = $sk['skill_name'];
-            } elseif (is_string($sk)) {
-                $skillNames[] = $sk;
-            }
+        if ($user->seekerProfile && $user->seekerProfile->resume_path) {
+            Storage::disk('public')->delete($user->seekerProfile->resume_path);
         }
+        
+        $user->delete();
 
-        $profile->skills = $skillNames;
-        $profile->save();
-
-        return response()->json([
-            'message' => 'Skills updated successfully',
-        ]);
+        return response()->json(['message' => 'Account deleted successfully']);
     }
 
     public function getSkills()
     {
         $skills = Skill::select('id', 'skill_name', 'category')->get();
-        
         return response()->json([
             'skills' => $skills
         ]);
     }
 }
+

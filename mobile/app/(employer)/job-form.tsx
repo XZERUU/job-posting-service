@@ -22,17 +22,13 @@ export default function JobForm() {
     salary_min: '', salary_max: '', location: 'Cagayan de Oro City',
     vacancies: '1', requirements: '', closing_date: '',
   });
-  const [allSkills, setAllSkills] = useState<any[]>([]);
-  const [selectedSkills, setSelectedSkills] = useState<Set<number>>(new Set());
+
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     (async () => {
       try {
-        const sk = await api.get('/skills');
-        setAllSkills(sk.data.skills);
-
         if (isEdit) {
           setLoading(true);
           const j = await api.get(`/jobs/${jobId}`);
@@ -48,7 +44,6 @@ export default function JobForm() {
             requirements: job.requirements || '',
             closing_date: job.closing_date ? new Date(job.closing_date).toISOString().split('T')[0] : '',
           });
-          setSelectedSkills(new Set((job.required_skills || []).map((s: any) => s.id)));
         }
       } catch (err) {
         Alert.alert('Error', getApiError(err));
@@ -60,13 +55,6 @@ export default function JobForm() {
 
   const setField = (k: string, v: any) => setForm((f: any) => ({ ...f, [k]: v }));
 
-  const toggleSkill = (id: number) => {
-    setSelectedSkills((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      return next;
-    });
-  };
 
   const handleSave = async () => {
     if (!form.job_title || !form.job_description) {
@@ -85,7 +73,6 @@ export default function JobForm() {
       vacancies: parseInt(form.vacancies, 10) || 1,
       requirements: form.requirements,
       closing_date: form.closing_date || null,
-      required_skills: Array.from(selectedSkills).map((id) => ({ skill_id: id, required_level: 'beginner' })),
     };
 
     try {
@@ -94,7 +81,7 @@ export default function JobForm() {
       } else {
         await api.post('/employer/jobs', payload);
       }
-      Alert.alert('Saved', `Job ${isEdit ? 'updated' : 'created'} successfully.`, [
+      Alert.alert('Saved', `Job ${isEdit ? 'updated' : 'submitted for admin approval'}.`, [
         { text: 'OK', onPress: () => router.replace('/(employer)/manage-jobs') },
       ]);
     } catch (err) {
@@ -104,12 +91,6 @@ export default function JobForm() {
     }
   };
 
-  const skillsByCategory: Record<string, any[]> = {};
-  for (const sk of allSkills) {
-    const cat = sk.category || 'Other';
-    if (!skillsByCategory[cat]) skillsByCategory[cat] = [];
-    skillsByCategory[cat].push(sk);
-  }
 
   if (loading) return <View style={styles.center}><Text style={styles.loadingText}>Loading...</Text></View>;
 
@@ -152,20 +133,6 @@ export default function JobForm() {
             <Input testID="job-close" label="Closing Date (YYYY-MM-DD)" value={form.closing_date} onChangeText={(v) => setField('closing_date', v)} placeholder="optional" />
           </Card>
 
-          <Card style={styles.sectionCard}>
-            <Text style={styles.sectionTitle}>Required Skills</Text>
-            <Text style={styles.help}>Used for rule-based matched and missing skill comparison only.</Text>
-            {Object.keys(skillsByCategory).sort().map((cat) => (
-              <View key={cat} style={{ marginTop: Spacing.sm }}>
-                <Text style={styles.catLabel}>{cat}</Text>
-                <View style={styles.chipWrap}>
-                  {skillsByCategory[cat].map((sk) => (
-                    <Chip key={sk.id} testID={`req-skill-${sk.id}`} label={sk.skill_name} active={selectedSkills.has(sk.id)} onPress={() => toggleSkill(sk.id)} />
-                  ))}
-                </View>
-              </View>
-            ))}
-          </Card>
 
           <View style={{ marginVertical: Spacing.md }}>
             <Button testID="save-job" title={isEdit ? 'Update Job' : 'Post Job'} onPress={handleSave} loading={saving} />
@@ -194,8 +161,7 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: FontSize.md, fontWeight: '900', color: Colors.textDark, marginBottom: Spacing.md },
   label: { fontSize: FontSize.sm, fontWeight: '700', color: Colors.textDark, marginBottom: 6 },
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: Spacing.sm },
-  catLabel: { fontSize: FontSize.xs, color: Colors.primary, fontWeight: '900', marginBottom: 6, textTransform: 'uppercase' },
-  help: { fontSize: FontSize.xs, color: Colors.gray, marginBottom: 4, lineHeight: 18 },
+
   twoColumn: { flexDirection: 'row' },
   sectionCard: { marginBottom: Spacing.md, borderRadius: Radius.lg },
 });

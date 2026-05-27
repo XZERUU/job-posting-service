@@ -23,15 +23,13 @@ export default function SeekerDashboard() {
 
   const loadData = async () => {
     try {
-      const [pRes, aRes, nRes] = await Promise.all([
+      const [pRes, aRes] = await Promise.all([
         api.get('/job-seeker/profile'),
         api.get('/applications/my-applications'),
-        api.get('/notifications'),
       ]);
       setProfile(pRes.data.profile);
       setSkills(pRes.data.skills || []);
       setApplications(aRes.data.applications || []);
-      setUnreadCount(nRes.data.unread_count || 0);
     } catch (err: any) {
       console.warn('Dashboard load error:', getApiError(err));
     }
@@ -59,7 +57,6 @@ export default function SeekerDashboard() {
   };
 
   const displayName = `${profile?.first_name || 'Job Seeker'} ${profile?.last_name || ''}`.trim();
-  const referralStatus = profile?.referral_status || 'draft';
 
   return (
     <ScrollView
@@ -82,20 +79,13 @@ export default function SeekerDashboard() {
         <Card style={styles.welcomeCard}>
           <Text style={styles.welcomeName}>Hello, {displayName}!</Text>
           <Text style={styles.welcomeSub}>
-            {referralStatus === 'referral_ready'
-              ? 'Your NSRP profile is referral-ready for PESO employment support.'
-              : profile?.profile_completed
-                ? 'Submit your NSRP profile for PESO review to become referral-ready.'
-                : 'Complete your NSRP profile to start the PESO referral process.'}
+            {!profile?.profile_completed
+              ? 'Complete your profile to start applying for jobs.'
+              : 'Your profile is complete and ready.'}
           </Text>
-          <View style={[styles.referralBadge, getReferralBadgeStyle(referralStatus)]}>
-            <Text style={[styles.referralBadgeText, referralStatus === 'referral_ready' && { color: Colors.white }]}>
-              {getReferralLabel(referralStatus)}
-            </Text>
-          </View>
           {!profile?.profile_completed && (
             <TouchableOpacity testID="complete-profile" onPress={() => router.push('/(seeker)/profile')} style={styles.noticePill}>
-              <Text style={styles.noticePillText}>Complete NSRP Profile</Text>
+              <Text style={styles.noticePillText}>Complete Profile</Text>
             </TouchableOpacity>
           )}
         </Card>
@@ -116,16 +106,11 @@ export default function SeekerDashboard() {
           />
         </View>
 
-        <View style={styles.statsRow}>
-          <StatCard label="Profile" value={profile?.profile_completed ? 'OK' : 'Open'} sub={profile?.profile_completed ? 'Complete' : 'Incomplete'} />
-          <StatCard label="Skills" value={skills.length} sub="encoded" />
-          <StatCard label="Referral" value={getReferralShort(referralStatus)} sub="status" />
-        </View>
+
 
         <Text style={styles.sectionTitle}>Quick Actions</Text>
         <View style={styles.actionList}>
           <ActionButton testID="action-profile" label="My Profile and Skills" onPress={() => router.push('/(seeker)/profile')} />
-          <ActionButton testID="action-notifications" label={`Notifications${unreadCount > 0 ? ` (${unreadCount})` : ''}`} onPress={() => router.push('/(seeker)/notifications')} />
         </View>
 
         <Text style={styles.sectionTitle}>Recent Applications</Text>
@@ -153,36 +138,7 @@ export default function SeekerDashboard() {
   );
 }
 
-function getReferralLabel(status: string) {
-  if (status === 'submitted') return 'Submitted for Review';
-  if (status === 'needs_revision') return 'Needs Revision';
-  if (status === 'referral_ready') return 'PESO Referral-Ready';
-  return 'Draft';
-}
 
-function getReferralShort(status: string) {
-  if (status === 'submitted') return 'Review';
-  if (status === 'needs_revision') return 'Revise';
-  if (status === 'referral_ready') return 'Ready';
-  return 'Draft';
-}
-
-function getReferralBadgeStyle(status: string) {
-  if (status === 'referral_ready') return { backgroundColor: Colors.primary, borderColor: Colors.primary };
-  if (status === 'submitted') return { backgroundColor: '#FEF3C7', borderColor: Colors.warning };
-  if (status === 'needs_revision') return { backgroundColor: '#FEE2E2', borderColor: Colors.error };
-  return { backgroundColor: Colors.muted, borderColor: Colors.border };
-}
-
-function StatCard({ label, value, sub }: { label: string; value: any; sub: string }) {
-  return (
-    <View style={styles.statCard}>
-      <Text style={styles.statLabel}>{label}</Text>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statSub}>{sub}</Text>
-    </View>
-  );
-}
 
 function ActionTile({
   label, icon, onPress, testID, primary,
@@ -232,15 +188,7 @@ const styles = StyleSheet.create({
   },
   welcomeName: { fontSize: FontSize.lg, fontWeight: '900', color: Colors.textDark },
   welcomeSub: { fontSize: FontSize.sm, color: Colors.gray, marginTop: 8, lineHeight: 20 },
-  referralBadge: {
-    alignSelf: 'flex-start',
-    borderWidth: 1,
-    borderRadius: Radius.pill,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    marginTop: Spacing.md,
-  },
-  referralBadgeText: { color: Colors.textDark, fontSize: FontSize.xs, fontWeight: '900' },
+
   noticePill: {
     alignSelf: 'flex-start',
     backgroundColor: '#FEF3C7',
@@ -269,19 +217,7 @@ const styles = StyleSheet.create({
   actionTileIconPrimary: { color: Colors.white },
   actionTileText: { color: Colors.textDark, fontSize: FontSize.sm, fontWeight: '900', textAlign: 'center' },
   actionTileTextPrimary: { color: Colors.white },
-  statsRow: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.md },
-  statCard: {
-    flex: 1,
-    backgroundColor: Colors.white,
-    borderColor: Colors.borderSoft,
-    borderWidth: 1,
-    borderRadius: Radius.lg,
-    padding: 12,
-    ...Shadow.card,
-  },
-  statLabel: { fontSize: FontSize.xs, color: Colors.gray, fontWeight: '900' },
-  statValue: { fontSize: FontSize.xl, fontWeight: '900', color: Colors.textDark, marginTop: 4 },
-  statSub: { fontSize: 10, color: Colors.gray, marginTop: 2 },
+
   sectionTitle: { fontSize: FontSize.md, fontWeight: '900', color: Colors.textDark, marginBottom: Spacing.sm, marginTop: Spacing.sm },
   actionList: { gap: Spacing.sm, marginBottom: Spacing.lg },
   actionBtn: {

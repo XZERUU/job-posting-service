@@ -39,7 +39,7 @@
                                     @elseif($application->status === 'rejected') bg-red-100 text-red-800
                                     @else bg-yellow-100 text-yellow-800
                                     @endif">
-                                    {{ ucfirst($application->status ?? 'pending') }}
+                                    {{ $application->status_label }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $application->created_at->format('M d, Y') }}</td>

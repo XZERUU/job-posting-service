@@ -12,6 +12,12 @@ class ApplicationApiController extends Controller
 {
     public function store(Request $request)
     {
+        if (! $this->isJobSeeker($request)) {
+            return response()->json([
+                'message' => 'Only job seekers can submit applications.',
+            ], 403);
+        }
+
         $request->validate([
             'job_post_id' => ['required', 'exists:job_posts,id'],
             'cover_letter' => ['nullable', 'string'],
@@ -55,6 +61,12 @@ class ApplicationApiController extends Controller
 
     public function myApplications(Request $request)
     {
+        if (! $this->isJobSeeker($request)) {
+            return response()->json([
+                'message' => 'Only job seekers can view their applications.',
+            ], 403);
+        }
+
         $applications = Application::with(['jobPost.employer'])
             ->where('user_id', $request->user()->id)
             ->latest()
@@ -69,6 +81,8 @@ class ApplicationApiController extends Controller
                 'applied_at' => $app->created_at,
                 // Joined fields expected by mobile
                 'job_title' => $app->jobPost ? $app->jobPost->job_title : 'Unknown Job',
+                'location' => $app->jobPost ? $app->jobPost->location : null,
+                'job_type' => $app->jobPost ? $app->jobPost->job_type : null,
                 'company_name' => ($app->jobPost && $app->jobPost->employer) ? $app->jobPost->employer->name : 'Unknown Company',
             ];
         });
@@ -76,5 +90,10 @@ class ApplicationApiController extends Controller
         return response()->json([
             'applications' => $formatted
         ]);
+    }
+
+    private function isJobSeeker(Request $request): bool
+    {
+        return in_array($request->user()?->role, ['seeker', 'job_seeker'], true);
     }
 }

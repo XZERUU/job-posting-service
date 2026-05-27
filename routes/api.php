@@ -27,7 +27,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Public/Seeker generic read access (jobs and skills)
     Route::get('/jobs', [JobApiController::class, 'index']);
     Route::get('/jobs/{id}', [JobApiController::class, 'show']);
-    Route::get('/jobs/{id}/match', [JobApiController::class, 'match']);
     Route::get('/skills', [SeekerApiController::class, 'getSkills']);
 
     // Seeker specific actions
@@ -37,7 +36,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/job-seeker/profile', [SeekerApiController::class, 'getProfile']);
     Route::post('/job-seeker/profile', [SeekerApiController::class, 'updateProfile']);
     Route::post('/job-seeker/skills', [SeekerApiController::class, 'updateSkills']);
-
+    Route::post('/job-seeker/password', [SeekerApiController::class, 'updatePassword']);
+    Route::delete('/job-seeker/account', [SeekerApiController::class, 'deleteAccount']);
     // Notifications (stubbed)
     Route::get('/notifications', [NotificationApiController::class, 'index']);
     Route::put('/notifications/{id}/read', [NotificationApiController::class, 'markRead']);
@@ -63,9 +63,9 @@ Route::middleware('auth:sanctum')->group(function () {
         
         Route::get('/admin/job-seekers', [AdminApiController::class, 'getJobSeekers']);
         Route::put('/admin/job-seekers/{id}/{action}', [AdminApiController::class, 'actionJobSeeker']);
-        Route::put('/admin/job-seekers/{id}/referral-status', [AdminApiController::class, 'updateSeekerReferral']);
         
         Route::get('/admin/jobs', [AdminApiController::class, 'getJobs']);
+        Route::put('/admin/jobs/{id}/approve', [AdminApiController::class, 'approveJob']);
         Route::put('/admin/jobs/{id}/close', [AdminApiController::class, 'closeJob']);
         Route::get('/admin/applications', [AdminApiController::class, 'getApplications']);
     });

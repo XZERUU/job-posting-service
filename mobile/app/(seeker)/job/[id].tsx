@@ -1,5 +1,5 @@
 // ============================================================
-// Job Details + Skill Match + Apply (combined)
+// Job Details + Apply (combined)
 // ============================================================
 import React, { useEffect, useState } from 'react';
 import {
@@ -14,7 +14,6 @@ export default function JobDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const [job, setJob] = useState<any>(null);
-  const [match, setMatch] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(false);
   const [coverLetter, setCoverLetter] = useState('');
@@ -22,12 +21,8 @@ export default function JobDetails() {
   useEffect(() => {
     (async () => {
       try {
-        const [j, m] = await Promise.all([
-          api.get(`/jobs/${id}`),
-          api.get(`/jobs/${id}/match`).catch(() => ({ data: null })),
-        ]);
+        const j = await api.get(`/jobs/${id}`);
         setJob(j.data.job);
-        setMatch(m.data);
       } catch (err) {
         Alert.alert('Error', getApiError(err));
       } finally {
@@ -97,42 +92,7 @@ export default function JobDetails() {
           )}
         </Card>
 
-        {match && (
-          <Card style={styles.sectionCard}>
-            <Text style={styles.section}>Rule-Based Skill Comparison</Text>
-            <Text style={styles.disclaimer}>{match.notice}</Text>
-            <View style={styles.matchRow}>
-              <MatchBox label="Matched" value={match.matched_count} active />
-              <MatchBox label="Missing" value={match.unmatched_count} />
-              <MatchBox label="Required" value={match.total_required} />
-            </View>
 
-            {match.matched_skills.length > 0 && (
-              <>
-                <Text style={styles.subSection}>Matched skills</Text>
-                <View style={styles.pillWrap}>
-                  {match.matched_skills.map((s: any) => (
-                    <View key={s.id} style={[styles.skillPill, styles.skillPillMatched]}>
-                      <Text style={styles.skillPillMatchedText}>{s.skill_name}</Text>
-                    </View>
-                  ))}
-                </View>
-              </>
-            )}
-            {match.unmatched_required_skills.length > 0 && (
-              <>
-                <Text style={styles.subSection}>Missing required skills</Text>
-                <View style={styles.pillWrap}>
-                  {match.unmatched_required_skills.map((s: any) => (
-                    <View key={s.id} style={styles.skillPill}>
-                      <Text style={styles.skillPillText}>{s.skill_name}</Text>
-                    </View>
-                  ))}
-                </View>
-              </>
-            )}
-          </Card>
-        )}
 
         <Card style={styles.sectionCard}>
           {alreadyApplied ? (
@@ -176,14 +136,6 @@ function MetaBox({ label, value }: { label: string; value: string }) {
   );
 }
 
-function MatchBox({ label, value, active }: { label: string; value: number; active?: boolean }) {
-  return (
-    <View style={[styles.matchBox, active && styles.matchBoxActive]}>
-      <Text style={[styles.matchValue, active && styles.matchValueActive]}>{value}</Text>
-      <Text style={[styles.matchLabel, active && styles.matchLabelActive]}>{label}</Text>
-    </View>
-  );
-}
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.lightBg },
@@ -224,19 +176,7 @@ const styles = StyleSheet.create({
   subSection: { fontSize: FontSize.sm, fontWeight: '900', color: Colors.primary, marginTop: Spacing.md, marginBottom: 6 },
   body: { color: Colors.textDark, fontSize: FontSize.sm, lineHeight: 21 },
   disclaimer: { color: Colors.gray, fontSize: FontSize.xs, lineHeight: 18 },
-  matchRow: { flexDirection: 'row', gap: Spacing.sm, marginTop: Spacing.md },
-  matchBox: {
-    flex: 1,
-    backgroundColor: Colors.muted,
-    borderRadius: Radius.md,
-    padding: Spacing.sm,
-    alignItems: 'center',
-  },
-  matchBoxActive: { backgroundColor: Colors.primary },
-  matchValue: { color: Colors.textDark, fontSize: FontSize.xl, fontWeight: '900' },
-  matchValueActive: { color: Colors.white },
-  matchLabel: { color: Colors.gray, fontSize: FontSize.xs, fontWeight: '800', marginTop: 2 },
-  matchLabelActive: { color: Colors.white },
+
   pillWrap: { flexDirection: 'row', flexWrap: 'wrap' },
   skillPill: {
     backgroundColor: Colors.white,
@@ -248,9 +188,7 @@ const styles = StyleSheet.create({
     marginRight: 6,
     marginBottom: 6,
   },
-  skillPillMatched: { backgroundColor: Colors.cardHighlight, borderColor: Colors.primary },
-  skillPillText: { color: Colors.textDark, fontSize: FontSize.xs, fontWeight: '700' },
-  skillPillMatchedText: { color: Colors.primary, fontSize: FontSize.xs, fontWeight: '800' },
+
   applicationStatus: {
     backgroundColor: Colors.cardHighlight,
     borderColor: Colors.borderSoft,

@@ -21,6 +21,16 @@ class Application extends Model
     // If you use timestamps (created_at, updated_at), keep this as true
     public $timestamps = true;
 
+    public function getStatusLabelAttribute(): string
+    {
+        return match ($this->status) {
+            'pending', 'for_review' => 'For Review',
+            'approved' => 'Approved',
+            'rejected' => 'Rejected',
+            default => ucwords(str_replace('_', ' ', (string) $this->status)),
+        };
+    }
+
     // Relationships
     public function jobPost()
     {

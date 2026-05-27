@@ -25,7 +25,7 @@ class ApplicationController extends Controller
             abort(403);
         }
 
-        if ($application->status !== 'pending') {
+        if (! in_array($application->status, ['pending', 'for_review'])) {
             return redirect()
                 ->route('applications.index')
                 ->with('status', 'Only pending applications can be edited.');
@@ -42,7 +42,7 @@ class ApplicationController extends Controller
             abort(403);
         }
 
-        if ($application->status !== 'pending') {
+        if (! in_array($application->status, ['pending', 'for_review'])) {
             return redirect()
                 ->route('applications.index')
                 ->with('status', 'Only pending applications can be edited.');
@@ -67,7 +67,7 @@ class ApplicationController extends Controller
             abort(403);
         }
 
-        if ($application->status !== 'pending') {
+        if (! in_array($application->status, ['pending', 'for_review'])) {
             return redirect()
                 ->route('applications.index')
                 ->with('status', 'Only pending applications can be cancelled.');
@@ -84,6 +84,10 @@ class ApplicationController extends Controller
     {
         if (! auth()->user()->isSeeker()) {
             return back()->with('error', 'Only job seekers can submit applications.');
+        }
+
+        if ($job->status !== 'active') {
+            return back()->with('error', 'You can only apply to active job posts.');
         }
 
         $validated = $request->validate([
@@ -104,7 +108,7 @@ class ApplicationController extends Controller
             'user_id' => auth()->id(),
             'job_post_id' => $job->id,
             'cover_letter' => $validated['cover_letter'] ?? null,
-            'status' => 'pending',
+            'status' => 'for_review',
         ];
 
         // Compatibility for existing local SQLite databases created before job_post_id was added.

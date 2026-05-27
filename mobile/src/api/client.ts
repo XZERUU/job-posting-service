@@ -23,6 +23,11 @@ api.interceptors.request.use(async (config) => {
 
 // Generic error normaliser
 export function getApiError(err: any): string {
+  if (err?.response?.data?.errors) {
+    const firstError = Object.values(err.response.data.errors)[0] as string[];
+    return firstError[0];
+  }
+  if (err?.response?.data?.message) return err.response.data.message;
   if (err?.response?.data?.error) return err.response.data.error;
   if (err?.message) return err.message;
   return 'Network error. Please try again.';

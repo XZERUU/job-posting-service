@@ -84,16 +84,15 @@ export default function AdminDashboard() {
         <Text style={styles.sectionTitle}>Management</Text>
         <View style={styles.actionList}>
           <ActionButton testID="admin-manage-emp" label="Manage Employers" detail="Create and monitor employer accounts" onPress={() => router.push('/(admin)/manage-employers')} />
-          <ActionButton testID="admin-manage-seekers" label="Manage Job Seekers" detail="Review profile and referral-ready status" onPress={() => router.push('/(admin)/manage-job-seekers')} />
+          <ActionButton testID="admin-manage-seekers" label="Manage Job Seekers" detail="Review user profiles" onPress={() => router.push('/(admin)/manage-job-seekers')} />
           <ActionButton testID="admin-jobs" label="Monitor Job Posts" detail="View active and closed job posts" onPress={() => router.push('/(admin)/monitor-jobs')} />
           <ActionButton testID="admin-apps" label="Monitor Applications" detail="Read-only application tracking" onPress={() => router.push('/(admin)/monitor-apps')} />
         </View>
 
         <View style={styles.noteCard}>
-          <Text style={styles.noteTitle}>Scope Reminder</Text>
+          <Text style={styles.noteTitle}>Admin Notice</Text>
           <Text style={styles.noteText}>
-            PESO Referral-Ready means the profile was reviewed for referral support.
-            Skill comparison remains rule-based only and does not make hiring decisions.
+            Ensure all jobs created by employers are approved before they appear in the job portal.
           </Text>
         </View>
       </View>

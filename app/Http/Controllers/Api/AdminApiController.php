@@ -79,12 +79,17 @@ class AdminApiController extends Controller
                 'last_name' => $nameParts[1] ?? '',
                 'email' => $u->email,
                 'contact_number' => $profile->phone ?? '',
-                'referral_status' => 'referral_ready',
-                'profile_completed' => !empty($profile->phone),
+                'location' => $profile->location ?? '',
+                'account_status' => 'active', // Adding this as the UI uses item.account_status
+                'registered_at' => $u->created_at,
+                'profile_completed' => !empty($profile->phone) && !empty($profile->location),
             ];
         });
 
-        return response()->json(['seekers' => $seekers]);
+        return response()->json([
+            'seekers' => $seekers,
+            'job_seekers' => $seekers,
+        ]);
     }
 
     public function actionJobSeeker(Request $request, $id, $action)
@@ -96,10 +101,6 @@ class AdminApiController extends Controller
         return response()->json(['message' => "Action $action successful"]);
     }
 
-    public function updateSeekerReferral(Request $request, $id)
-    {
-        return response()->json(['message' => 'Referral status updated']);
-    }
 
     public function getJobs()
     {
@@ -110,6 +111,13 @@ class AdminApiController extends Controller
         });
 
         return response()->json(['jobs' => $jobs]);
+    }
+
+    public function approveJob(Request $request, $id)
+    {
+        $job = JobPost::findOrFail($id);
+        $job->update(['status' => 'active']);
+        return response()->json(['message' => 'Job approved successfully']);
     }
 
     public function closeJob(Request $request, $id)

@@ -53,7 +53,7 @@
                                         @elseif($post->status === 'rejected') bg-red-100 text-red-800
                                         @else bg-yellow-100 text-yellow-800
                                         @endif">
-                                        {{ ucfirst($post->status ?? 'pending') }}
+                                        {{ $post->status_label }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-600">{{ $post->created_at->format('M d, Y') }}</td>

@@ -51,71 +51,30 @@ class JobApiController extends Controller
             $query->where('user_id', $request->user()->id);
         }])->findOrFail($id);
 
+        $user = $request->user();
+        $canView = $job->status === 'active'
+            || $user?->role === 'admin'
+            || ($user?->role === 'employer' && $job->employer_id === $user->id);
+
+        if (! $canView) {
+            abort(404);
+        }
+
         $data = $job->toArray();
         $data['company_name'] = $job->employer ? $job->employer->name : 'Unknown';
         
-        // Map my_application if the user has applied
-        $data['my_application'] = $job->applications->first() ? $job->applications->first()->toArray() : null;
+        if ($app = $job->applications->first()) {
+            $appData = $app->toArray();
+            $appData['application_status'] = $app->status;
+            $appData['applied_at'] = $app->created_at;
+            $data['my_application'] = $appData;
+        } else {
+            $data['my_application'] = null;
+        }
 
         return response()->json([
             'job' => $data
         ]);
     }
 
-    public function match(Request $request, $id)
-    {
-        $job = JobPost::findOrFail($id);
-        $user = $request->user();
-        $profile = $user->seekerProfile;
-
-        // Ensure user has a profile
-        $seekerSkills = [];
-        if ($profile && is_array($profile->skills)) {
-            $seekerSkills = array_map('strtolower', array_map('trim', $profile->skills));
-        }
-
-        // Get job required skills
-        $requiredSkills = \DB::table('job_required_skills')
-            ->join('skills', 'job_required_skills.skill_id', '=', 'skills.id')
-            ->where('job_required_skills.job_post_id', $job->id)
-            ->where('job_required_skills.is_required', true)
-            ->select('skills.skill_name', 'skills.id')
-            ->get();
-
-        $matched = [];
-        $unmatched = [];
-
-        foreach ($requiredSkills as $reqSkill) {
-            $reqName = strtolower(trim($reqSkill->skill_name));
-            $isMatched = false;
-
-            foreach ($seekerSkills as $userSkill) {
-                if (str_contains($reqName, $userSkill) || str_contains($userSkill, $reqName)) {
-                    $isMatched = true;
-                    break;
-                }
-            }
-
-            if ($isMatched) {
-                $matched[] = [
-                    'id' => $reqSkill->id,
-                    'skill_name' => $reqSkill->skill_name,
-                ];
-            } else {
-                $unmatched[] = [
-                    'id' => $reqSkill->id,
-                    'skill_name' => $reqSkill->skill_name,
-                ];
-            }
-        }
-
-        return response()->json([
-            'matched_count' => count($matched),
-            'unmatched_count' => count($unmatched),
-            'total_required' => count($requiredSkills),
-            'matched_skills' => $matched,
-            'unmatched_required_skills' => $unmatched,
-            'notice' => 'This is a rule-based check based on encoded skills. It is not an automated hiring decision.',
-        ]);
-    }
 }

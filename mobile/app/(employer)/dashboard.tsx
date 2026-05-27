@@ -9,7 +9,7 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { Card, EmptyState } from '../../src/components/ui';
 import { api, getApiError } from '../../src/api/client';
 import { useAuth } from '../../src/context/AuthContext';
-import { Colors, Spacing, FontSize, Radius, Shadow } from '../../src/constants/theme';
+import { Colors, Spacing, FontSize, Radius, Shadow, JobStatusLabels } from '../../src/constants/theme';
 import { confirmAction } from '../../src/utils/confirm';
 
 export default function EmployerDashboard() {
@@ -131,7 +131,9 @@ export default function EmployerDashboard() {
             <TouchableOpacity key={j.id} testID={`emp-job-${j.id}`} onPress={() => router.push({ pathname: '/(employer)/applicants', params: { jobId: j.id, jobTitle: j.job_title } })} activeOpacity={0.85} style={styles.jobCard}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.jobTitle}>{j.job_title}</Text>
-                <Text style={styles.jobMeta}>{j.applicant_count || 0} applicant{j.applicant_count === 1 ? '' : 's'} / {j.status}</Text>
+                <Text style={styles.jobMeta}>
+                  {j.applicant_count || 0} applicant{j.applicant_count === 1 ? '' : 's'} / {JobStatusLabels[j.status as keyof typeof JobStatusLabels] || j.status}
+                </Text>
               </View>
               <Text style={styles.manageLink}>Manage</Text>
             </TouchableOpacity>

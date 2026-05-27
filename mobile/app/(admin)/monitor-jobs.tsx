@@ -7,7 +7,7 @@ import { useFocusEffect } from 'expo-router';
 import { Card, Button, EmptyState } from '../../src/components/ui';
 import { api, getApiError } from '../../src/api/client';
 import { confirmAction } from '../../src/utils/confirm';
-import { Colors, Spacing, FontSize, Radius } from '../../src/constants/theme';
+import { Colors, Spacing, FontSize, Radius, JobStatusLabels } from '../../src/constants/theme';
 
 export default function MonitorJobs() {
   const [jobs, setJobs] = useState<any[]>([]);
@@ -29,6 +29,26 @@ export default function MonitorJobs() {
     setRefreshing(true);
     await load();
     setRefreshing(false);
+  };
+
+  const approveJob = (job: any) => {
+    confirmAction(
+      'Approve Job Post',
+      `Approve "${job.job_title}" so it becomes visible to job seekers?`,
+      async () => {
+        setBusyId(job.id);
+        try {
+          await api.put(`/admin/jobs/${job.id}/approve`);
+          await load();
+        } catch (err) {
+          Alert.alert('Error', getApiError(err));
+        } finally {
+          setBusyId(null);
+        }
+      },
+      'Approve',
+      false,
+    );
   };
 
   const closeJob = (job: any) => {
@@ -72,7 +92,9 @@ export default function MonitorJobs() {
                 <Text style={styles.company}>{item.company_name}</Text>
               </View>
               <View style={[styles.statusPill, item.status === 'closed' && styles.closedPill]}>
-                <Text style={[styles.statusText, item.status === 'closed' && styles.closedText]}>{item.status}</Text>
+                <Text style={[styles.statusText, item.status === 'closed' && styles.closedText]}>
+                  {JobStatusLabels[item.status as keyof typeof JobStatusLabels] || item.status}
+                </Text>
               </View>
             </View>
             <Text style={styles.meta}>
@@ -80,8 +102,18 @@ export default function MonitorJobs() {
             </Text>
             <Text style={styles.meta}>Applicants: {item.applicant_count || 0}</Text>
             <Text style={styles.date}>Posted {new Date(item.posted_at).toLocaleDateString()}</Text>
-            {item.status !== 'closed' && (
+            {item.status === 'pending' && (
               <View style={{ marginTop: Spacing.md }}>
+                <Button
+                  testID={`approve-job-${item.id}`}
+                  title="Approve Job"
+                  onPress={() => approveJob(item)}
+                  loading={busyId === item.id}
+                />
+              </View>
+            )}
+            {item.status !== 'closed' && (
+              <View style={{ marginTop: item.status === 'pending' ? Spacing.sm : Spacing.md }}>
                 <Button
                   testID={`close-job-${item.id}`}
                   title="Close Job"

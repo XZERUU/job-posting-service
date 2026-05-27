@@ -68,20 +68,31 @@ export const FontSize = {
 
 export const StatusColors = {
   submitted: { bg: Colors.cardHighlight, text: Colors.primaryDark, border: Colors.primarySoft },
-  pending: { bg: Colors.surfaceMuted, text: Colors.textDark, border: Colors.grayLight },
+  pending: { bg: Colors.cardHighlight, text: Colors.primary, border: Colors.primary },
   for_review: { bg: Colors.cardHighlight, text: Colors.primary, border: Colors.primary },
   for_interview: { bg: '#DBEAFE', text: '#1E40AF', border: '#1E40AF' },
   hired: { bg: '#DCFCE7', text: '#166534', border: '#16A34A' },
   rejected: { bg: '#FEE2E2', text: '#991B1B', border: '#DC2626' },
   closed: { bg: '#E5E7EB', text: '#374151', border: '#9CA3AF' },
+  active: { bg: '#DCFCE7', text: '#166534', border: '#16A34A' },
+  approved: { bg: '#DCFCE7', text: '#166534', border: '#16A34A' },
 };
 
 export const StatusLabels = {
   submitted: 'Submitted',
-  pending: 'Pending',
+  pending: 'For Review',
   for_review: 'For Review',
   for_interview: 'For Interview',
   hired: 'Hired',
+  rejected: 'Rejected',
+  closed: 'Closed',
+  active: 'Active',
+  approved: 'Approved',
+};
+
+export const JobStatusLabels = {
+  pending: 'Pending Approval',
+  active: 'Active',
   rejected: 'Rejected',
   closed: 'Closed',
 };
