@@ -26,7 +26,7 @@ class EmployerController extends Controller
             ->get();
 
         $total_applications = $applications->count();
-        $pending_applications = $applications->where('status', 'pending')->count();
+        $pending_applications = $applications->whereIn('status', ['pending', 'for_review'])->count();
         $approved_applications = $applications->where('status', 'approved')->count();
 
         $recent_applications = $applications->sortByDesc('created_at')->take(10);

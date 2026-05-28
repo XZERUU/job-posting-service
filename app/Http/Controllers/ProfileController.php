@@ -29,7 +29,7 @@ class ProfileController extends Controller
             'recommendedJobs' => [],
             'stats' => [
                 'applied' => $applications->count(),
-                'under_review' => $applications->where('status', 'pending')->count(),
+                'under_review' => $applications->whereIn('status', ['pending', 'for_review'])->count(),
                 'approved' => $applications->where('status', 'approved')->count(),
                 'profile_views' => 0,
             ],

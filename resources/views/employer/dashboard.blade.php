@@ -107,7 +107,7 @@
                                     @elseif($job->status === 'rejected') bg-red-100 text-red-800
                                     @else bg-yellow-100 text-yellow-800
                                     @endif">
-                                    {{ ucfirst($job->status ?? 'pending') }}
+                                    {{ $job->status_label }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-sm">
@@ -160,7 +160,7 @@
                                     @elseif($app->status === 'rejected') bg-red-100 text-red-800
                                     @else bg-yellow-100 text-yellow-800
                                     @endif">
-                                    {{ ucfirst($app->status ?? 'pending') }}
+                                    {{ $app->status_label }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $app->created_at?->format('M d, Y') ?? 'N/A' }}</td>

@@ -7,6 +7,7 @@
 
     $statusClasses = [
         'pending' => 'bg-amber-50 text-amber-700',
+        'for_review' => 'bg-amber-50 text-amber-700',
         'approved' => 'bg-green-50 text-green-700',
         'rejected' => 'bg-red-50 text-red-700',
     ];
@@ -152,7 +153,7 @@
                                 <div class="text-xs font-medium text-gray-900">{{ $application->jobPost->job_title ?? 'Deleted job post' }}</div>
                                 <div class="text-xs text-gray-400">{{ $application->jobPost->employer->name ?? 'Unknown employer' }}</div>
                             </div>
-                            <span class="px-2 py-0.5 text-xs font-medium rounded-md {{ $class }}">{{ ucfirst($status) }}</span>
+                            <span class="px-2 py-0.5 text-xs font-medium rounded-md {{ $class }}">{{ $application->status_label }}</span>
                         </div>
                     @empty
                         <p class="text-xs text-gray-400">No applications yet.</p>

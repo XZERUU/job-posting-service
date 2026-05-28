@@ -105,7 +105,7 @@
                     @elseif($application->status === 'rejected') bg-red-100 text-red-800
                     @else bg-yellow-100 text-yellow-800
                     @endif">
-                    {{ ucfirst($application->status ?? 'pending') }}
+                    {{ $application->status_label }}
                 </span>
             </section>
         </div>

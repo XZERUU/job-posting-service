@@ -33,11 +33,11 @@
                                     @elseif($application->status === 'rejected') bg-red-50 text-red-700
                                     @else bg-yellow-50 text-yellow-700
                                     @endif">
-                                    {{ ucfirst($application->status) }}
+                                    {{ $application->status_label }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-sm">
-                                @if($application->status === 'pending')
+                                @if(in_array($application->status, ['pending', 'for_review'], true))
                                     <div class="flex items-center gap-3">
                                         <a href="{{ route('applications.edit', $application) }}" class="text-blue-600 hover:text-blue-900 font-medium">Edit</a>
                                         <form method="POST" action="{{ route('applications.destroy', $application) }}" onsubmit="return confirm('Cancel this application?')">
