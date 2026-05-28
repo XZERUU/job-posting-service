@@ -2,8 +2,6 @@
 
 Repository: `XZERUU/job-posting-service`
 
-Current integrated branch: `backup-mobile-integration`
-
 This project is an Integrative Programming system that connects a Laravel web application, a Laravel backend/API, a MySQL database, and an Expo/React Native mobile application.
 
 ## Project Overview
